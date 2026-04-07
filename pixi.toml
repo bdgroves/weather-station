@@ -1,0 +1,12 @@
+[project]
+name = "weather-station"
+version = "1.0.0"
+description = "High-end weather station dashboard for GitHub Pages"
+channels = ["conda-forge"]
+platforms = ["win-64", "linux-64"]
+
+[tasks]
+fetch = "python fetch_weather.py"
+
+[dependencies]
+python = ">=3.12"
