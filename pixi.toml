@@ -1,4 +1,4 @@
-[project]
+[workspace]
 name = "weather-station"
 version = "1.0.0"
 description = "High-end weather station dashboard for GitHub Pages"
