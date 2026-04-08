@@ -412,7 +412,7 @@ function fmtTime(iso) { if(!iso)return'--'; return new Date(iso).toLocaleTimeStr
 function fmtHour(iso) { const h=new Date(iso).getHours(); if(h===0)return'12a'; if(h<12)return h+'a'; if(h===12)return'12p'; return(h-12)+'p'; }
 function fmtDay(s) { return new Date(s+'T12:00:00').toLocaleDateString('en-US',{weekday:'short'}); }
 function fmtDate(s) { return new Date(s+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'}); }
-function isToday(s) { return s === new Date().toISOString().split('T')[0]; }
+function isToday(s) { const n=new Date(); return s === n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0')+'-'+String(n.getDate()).padStart(2,'0'); }
 function isNowHour(iso) { const d=new Date(iso),n=new Date(); return d.getFullYear()===n.getFullYear()&&d.getMonth()===n.getMonth()&&d.getDate()===n.getDate()&&d.getHours()===n.getHours(); }
 function r(v) { return v!=null?Math.round(v):'--'; }
 function r1(v) { return v!=null?Math.round(v*10)/10:'--'; }
