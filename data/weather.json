@@ -1,5 +1,5 @@
 {
-  "generated_utc": "2026-04-11T17:54:06.079047+00:00",
+  "generated_utc": "2026-04-11T18:27:22.911141+00:00",
   "moon": {
     "phase_name": "Last Quarter",
     "emoji": "\ud83c\udf17",
@@ -19,36 +19,36 @@
       },
       "current": {
         "temp": 49.0,
-        "feels_like": 47.9,
+        "feels_like": 47.3,
         "humidity": 95,
-        "dew_point": 47.7,
+        "dew_point": 47.6,
         "weather_code": 53,
         "weather_desc": "Moderate drizzle",
         "weather_icon": "\ud83c\udf26\ufe0f",
         "is_day": 1,
         "cloud_cover": 100,
-        "pressure_msl": 1007.8,
-        "surface_pressure": 998.1,
-        "wind_speed": 1.3,
-        "wind_dir_deg": 270,
-        "wind_dir": "W",
-        "wind_gusts": 2.9,
-        "visibility": 29527.559,
+        "pressure_msl": 1008.0,
+        "surface_pressure": 998.3,
+        "wind_speed": 2.4,
+        "wind_dir_deg": 326,
+        "wind_dir": "NW",
+        "wind_gusts": 2.5,
+        "visibility": 31167.979,
         "precipitation": 0.008,
         "rain": 0.008,
         "snowfall": 0.0
       },
       "pressure_trend": {
-        "direction": "falling_fast",
-        "change_3h": -1.8,
-        "arrow": "\u2b07"
+        "direction": "falling",
+        "change_3h": -1.3,
+        "arrow": "\u2198"
       },
       "air_quality": {
         "us_aqi": 44,
-        "pm2_5": 6.3,
-        "pm10": 6.5,
-        "co": 184.0,
-        "ozone": 75.0
+        "pm2_5": 6.2,
+        "pm10": 6.4,
+        "co": 189.0,
+        "ozone": 72.0
       },
       "alerts": [],
       "hourly": [
@@ -1110,37 +1110,37 @@
         "elevation_ft": 2844
       },
       "current": {
-        "temp": 54.2,
-        "feels_like": 48.7,
+        "temp": 54.6,
+        "feels_like": 49.5,
         "humidity": 75,
-        "dew_point": 46.4,
+        "dew_point": 46.9,
         "weather_code": 1,
         "weather_desc": "Mainly clear",
         "weather_icon": "\ud83c\udf24\ufe0f",
         "is_day": 1,
-        "cloud_cover": 35,
-        "pressure_msl": 1013.7,
-        "surface_pressure": 915.3,
-        "wind_speed": 14.5,
-        "wind_dir_deg": 180,
+        "cloud_cover": 39,
+        "pressure_msl": 1013.9,
+        "surface_pressure": 915.5,
+        "wind_speed": 15.1,
+        "wind_dir_deg": 188,
         "wind_dir": "S",
-        "wind_gusts": 25.1,
-        "visibility": 74146.984,
+        "wind_gusts": 25.3,
+        "visibility": 72178.477,
         "precipitation": 0.0,
         "rain": 0.0,
         "snowfall": 0.0
       },
       "pressure_trend": {
-        "direction": "falling_fast",
-        "change_3h": -2.6,
-        "arrow": "\u2b07"
+        "direction": "falling",
+        "change_3h": -1.4,
+        "arrow": "\u2198"
       },
       "air_quality": {
-        "us_aqi": 30,
-        "pm2_5": 2.2,
-        "pm10": 4.3,
+        "us_aqi": 29,
+        "pm2_5": 2.0,
+        "pm10": 3.5,
         "co": 137.0,
-        "ozone": 65.0
+        "ozone": 68.0
       },
       "alerts": [],
       "hourly": [
@@ -2202,37 +2202,37 @@
         "elevation_ft": 4505
       },
       "current": {
-        "temp": 52.3,
-        "feels_like": 46.9,
-        "humidity": 44,
-        "dew_point": 31.0,
+        "temp": 54.0,
+        "feels_like": 50.0,
+        "humidity": 41,
+        "dew_point": 30.8,
         "weather_code": 3,
         "weather_desc": "Overcast",
         "weather_icon": "\u2601\ufe0f",
         "is_day": 1,
-        "cloud_cover": 100,
-        "pressure_msl": 1011.3,
-        "surface_pressure": 859.3,
-        "wind_speed": 4.5,
-        "wind_dir_deg": 110,
-        "wind_dir": "ESE",
-        "wind_gusts": 4.5,
-        "visibility": 136482.938,
+        "cloud_cover": 99,
+        "pressure_msl": 1011.0,
+        "surface_pressure": 859.5,
+        "wind_speed": 3.9,
+        "wind_dir_deg": 100,
+        "wind_dir": "E",
+        "wind_gusts": 6.0,
+        "visibility": 151574.797,
         "precipitation": 0.0,
         "rain": 0.0,
         "snowfall": 0.0
       },
       "pressure_trend": {
         "direction": "falling_fast",
-        "change_3h": -3.1,
+        "change_3h": -1.6,
         "arrow": "\u2b07"
       },
       "air_quality": {
-        "us_aqi": 33,
+        "us_aqi": 34,
         "pm2_5": 0.2,
         "pm10": 0.2,
-        "co": 145.0,
-        "ozone": 76.0
+        "co": 137.0,
+        "ozone": 78.0
       },
       "alerts": [],
       "hourly": [
@@ -3294,39 +3294,52 @@
         "elevation_ft": -282
       },
       "current": {
-        "temp": 78.0,
-        "feels_like": 76.8,
-        "humidity": 24,
-        "dew_point": 38.2,
+        "temp": 79.3,
+        "feels_like": 78.0,
+        "humidity": 22,
+        "dew_point": 37.2,
         "weather_code": 3,
         "weather_desc": "Overcast",
         "weather_icon": "\u2601\ufe0f",
         "is_day": 1,
-        "cloud_cover": 80,
-        "pressure_msl": 1010.4,
-        "surface_pressure": 1017.2,
-        "wind_speed": 2.8,
-        "wind_dir_deg": 252,
-        "wind_dir": "WSW",
-        "wind_gusts": 6.0,
-        "visibility": 233267.719,
+        "cloud_cover": 100,
+        "pressure_msl": 1010.0,
+        "surface_pressure": 1016.8,
+        "wind_speed": 3.8,
+        "wind_dir_deg": 234,
+        "wind_dir": "SW",
+        "wind_gusts": 8.1,
+        "visibility": 244750.656,
         "precipitation": 0.0,
         "rain": 0.0,
         "snowfall": 0.0
       },
       "pressure_trend": {
         "direction": "falling_fast",
-        "change_3h": -3.1,
+        "change_3h": -1.8,
         "arrow": "\u2b07"
       },
       "air_quality": {
         "us_aqi": 31,
-        "pm2_5": 4.7,
-        "pm10": 15.0,
-        "co": 111.0,
-        "ozone": 66.0
+        "pm2_5": 3.6,
+        "pm10": 12.1,
+        "co": 112.0,
+        "ozone": 76.0
       },
-      "alerts": [],
+      "alerts": [
+        {
+          "event": "Wind Advisory",
+          "severity": "Moderate",
+          "urgency": "Expected",
+          "headline": "Wind Advisory issued April 11 at 10:59AM PDT until April 12 at 11:00PM PDT by NWS Las Vegas NV",
+          "description": "* WHAT...South to Southwest winds 20 to 30 mph with gusts up to 50\nmph expected.\n\n* WHERE...Death Valley National Park and Owens Valley.\n\n* WHEN...From 5 PM this afternoon to 11 PM PDT Sunday.\n\n* IMPACTS...Gusty winds will blow around unsecured objects. Tree\nlimbs could be blown down and a few power outages may result.\n\n* ADDITIONAL DETAILS...Strongest winds in the Owens Valley are\nexpected mainly along and west of the US-395 corridor.",
+          "instruction": "Winds this strong can make driving difficult, especially for\nhigh-profile vehicles. Use extra caution.\n\nSecure outdoor objects.",
+          "onset": "2026-04-11T17:00:00-07:00",
+          "expires": "2026-04-11T18:00:00-07:00",
+          "sender": "NWS Las Vegas NV",
+          "color": "yellow"
+        }
+      ],
       "hourly": [
         {
           "time": "2026-04-11T00:00",
