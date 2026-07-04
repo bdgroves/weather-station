@@ -1,12 +1,12 @@
 {
-  "generated_utc": "2026-07-03T23:54:36.984250+00:00",
+  "generated_utc": "2026-07-04T01:47:02.238166+00:00",
   "moon": {
     "phase_name": "Waning Gibbous",
     "emoji": "\ud83c\udf16",
-    "illumination": 89.3,
-    "age_days": 17.9,
-    "days_to_full": 26.4,
-    "days_to_new": 11.6
+    "illumination": 81.9,
+    "age_days": 18.9,
+    "days_to_full": 25.4,
+    "days_to_new": 10.6
   },
   "stations": {
     "lakewood_wa": {
