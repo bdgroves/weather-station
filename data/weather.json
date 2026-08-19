@@ -1,5 +1,5 @@
 {
-  "generated_utc": "2026-08-19T10:51:07.043496+00:00",
+  "generated_utc": "2026-08-19T11:13:46.055725+00:00",
   "moon": {
     "phase_name": "First Quarter",
     "emoji": "\ud83c\udf13",
@@ -18,37 +18,37 @@
         "elevation_ft": 300
       },
       "current": {
-        "temp": 55.2,
-        "feels_like": 54.5,
-        "humidity": 91,
-        "dew_point": 52.6,
+        "temp": 54.8,
+        "feels_like": 54.2,
+        "humidity": 92,
+        "dew_point": 52.5,
         "weather_code": 0,
         "weather_desc": "Clear sky",
         "weather_icon": "\u2600\ufe0f",
         "is_day": 0,
-        "cloud_cover": 6,
-        "pressure_msl": 1017.9,
-        "surface_pressure": 1008.2,
-        "wind_speed": 3.4,
-        "wind_dir_deg": 212,
+        "cloud_cover": 8,
+        "pressure_msl": 1018.0,
+        "surface_pressure": 1008.3,
+        "wind_speed": 3.2,
+        "wind_dir_deg": 205,
         "wind_dir": "SSW",
-        "wind_gusts": 4.7,
-        "visibility": 44291.34,
+        "wind_gusts": 4.5,
+        "visibility": 42979.004,
         "precipitation": 0.0,
         "rain": 0.0,
         "snowfall": 0.0
       },
       "pressure_trend": {
         "direction": "steady",
-        "change_3h": 0.0,
+        "change_3h": 0.2,
         "arrow": "\u2192"
       },
       "air_quality": {
         "us_aqi": 56,
-        "pm2_5": 12.2,
-        "pm10": 14.1,
-        "co": 114.0,
-        "ozone": 32.0
+        "pm2_5": 12.5,
+        "pm10": 14.3,
+        "co": 108.0,
+        "ozone": 30.0
       },
       "alerts": [],
       "hourly": [
@@ -1110,37 +1110,37 @@
         "elevation_ft": 2844
       },
       "current": {
-        "temp": 73.4,
-        "feels_like": 67.2,
+        "temp": 73.3,
+        "feels_like": 67.5,
         "humidity": 32,
-        "dew_point": 41.7,
+        "dew_point": 41.6,
         "weather_code": 0,
         "weather_desc": "Clear sky",
         "weather_icon": "\u2600\ufe0f",
         "is_day": 0,
-        "cloud_cover": 1,
+        "cloud_cover": 3,
         "pressure_msl": 1010.6,
         "surface_pressure": 915.8,
-        "wind_speed": 9.8,
-        "wind_dir_deg": 145,
+        "wind_speed": 8.9,
+        "wind_dir_deg": 146,
         "wind_dir": "SE",
-        "wind_gusts": 10.5,
-        "visibility": 195209.968,
+        "wind_gusts": 9.6,
+        "visibility": 194225.712,
         "precipitation": 0.0,
         "rain": 0.0,
         "snowfall": 0.0
       },
       "pressure_trend": {
-        "direction": "steady",
-        "change_3h": 0.3,
-        "arrow": "\u2192"
+        "direction": "rising",
+        "change_3h": 1.0,
+        "arrow": "\u2197"
       },
       "air_quality": {
-        "us_aqi": 42,
-        "pm2_5": 5.5,
-        "pm10": 5.7,
-        "co": 112.0,
-        "ozone": 37.0
+        "us_aqi": 41,
+        "pm2_5": 5.1,
+        "pm10": 5.3,
+        "co": 106.0,
+        "ozone": 33.0
       },
       "alerts": [],
       "hourly": [
@@ -2202,37 +2202,37 @@
         "elevation_ft": 4505
       },
       "current": {
-        "temp": 65.6,
-        "feels_like": 61.3,
+        "temp": 65.2,
+        "feels_like": 61.0,
         "humidity": 30,
-        "dew_point": 33.4,
+        "dew_point": 33.0,
         "weather_code": 2,
         "weather_desc": "Partly cloudy",
         "weather_icon": "\u26c5",
         "is_day": 0,
-        "cloud_cover": 64,
-        "pressure_msl": 1011.2,
+        "cloud_cover": 71,
+        "pressure_msl": 1011.3,
         "surface_pressure": 862.7,
-        "wind_speed": 1.7,
-        "wind_dir_deg": 203,
-        "wind_dir": "SSW",
-        "wind_gusts": 3.1,
-        "visibility": 205052.496,
+        "wind_speed": 1.1,
+        "wind_dir_deg": 169,
+        "wind_dir": "S",
+        "wind_gusts": 3.4,
+        "visibility": 202099.728,
         "precipitation": 0.0,
         "rain": 0.0,
         "snowfall": 0.0
       },
       "pressure_trend": {
         "direction": "steady",
-        "change_3h": 0.0,
+        "change_3h": 0.1,
         "arrow": "\u2192"
       },
       "air_quality": {
-        "us_aqi": 36,
-        "pm2_5": 9.3,
-        "pm10": 9.6,
-        "co": 133.0,
-        "ozone": 60.0
+        "us_aqi": 35,
+        "pm2_5": 9.6,
+        "pm10": 9.9,
+        "co": 122.0,
+        "ozone": 61.0
       },
       "alerts": [],
       "hourly": [
@@ -3294,36 +3294,36 @@
         "elevation_ft": -282
       },
       "current": {
-        "temp": 96.0,
-        "feels_like": 93.7,
+        "temp": 95.9,
+        "feels_like": 93.5,
         "humidity": 16,
-        "dew_point": 42.6,
+        "dew_point": 42.5,
         "weather_code": 0,
         "weather_desc": "Clear sky",
         "weather_icon": "\u2600\ufe0f",
         "is_day": 0,
         "cloud_cover": 0,
-        "pressure_msl": 1006.9,
-        "surface_pressure": 1013.5,
+        "pressure_msl": 1007.1,
+        "surface_pressure": 1013.7,
         "wind_speed": 1.1,
         "wind_dir_deg": 101,
         "wind_dir": "E",
-        "wind_gusts": 4.3,
-        "visibility": 293635.2,
+        "wind_gusts": 4.5,
+        "visibility": 294291.328,
         "precipitation": 0.0,
         "rain": 0.0,
         "snowfall": 0.0
       },
       "pressure_trend": {
         "direction": "rising",
-        "change_3h": 0.6,
+        "change_3h": 0.8,
         "arrow": "\u2197"
       },
       "air_quality": {
         "us_aqi": 33,
-        "pm2_5": 3.8,
-        "pm10": 17.5,
-        "co": 95.0,
+        "pm2_5": 4.0,
+        "pm10": 17.9,
+        "co": 94.0,
         "ozone": 72.0
       },
       "alerts": [
@@ -3331,11 +3331,11 @@
           "event": "Extreme Heat Warning",
           "severity": "Severe",
           "urgency": "Expected",
-          "headline": "Extreme Heat Warning issued August 18 at 4:16AM PDT until August 21 at 8:00PM PDT by NWS Las Vegas NV",
-          "description": "* WHAT...Dangerously hot conditions with temperatures up to 115 to\n118 degrees expected through Death Valley and the lower Colorado\nRiver Valley, with highs between 107 to 110 degrees elsewhere.\n\n* WHERE...Portions of northwest Arizona, southeast California, and\nsouthern Nevada.\n\n* WHEN...From 10 AM PDT /10 AM MST/ this morning to 8 PM PDT /8 PM\nMST/ Friday.\n\n* IMPACTS...Heat-related illnesses increase significantly during\nextreme heat events.",
+          "headline": "Extreme Heat Warning issued August 19 at 4:11AM PDT until August 21 at 8:00PM PDT by NWS Las Vegas NV",
+          "description": "* WHAT...Dangerously hot conditions with temperatures up to 115 to\n118 degrees expected through Death Valley and the lower Colorado\nRiver Valley, with highs between 107 to 110 degrees elsewhere.\n\n* WHERE...Portions of northwest Arizona, southeast California, and\nsouthern Nevada.\n\n* WHEN...Until 8 PM PDT /8 PM MST/ Friday.\n\n* IMPACTS...Heat-related illnesses increase significantly during\nextreme heat events.",
           "instruction": "Drink plenty of fluids, stay in an air-conditioned room, stay out of\nthe sun, and check up on relatives and neighbors.\n\nDo not leave young children and pets in unattended vehicles. Car\ninteriors will reach lethal temperatures in a matter of minutes.\n\nTake extra precautions when outside. Wear lightwe",
-          "onset": "2026-08-18T10:00:00-07:00",
-          "expires": "2026-08-19T05:00:00-07:00",
+          "onset": "2026-08-19T04:11:00-07:00",
+          "expires": "2026-08-20T05:00:00-07:00",
           "sender": "NWS Las Vegas NV",
           "color": "orange"
         }
