@@ -1,5 +1,5 @@
 {
-  "generated_utc": "2026-08-21T13:22:54.326127+00:00",
+  "generated_utc": "2026-08-21T14:03:27.122969+00:00",
   "moon": {
     "phase_name": "First Quarter",
     "emoji": "\ud83c\udf13",
@@ -18,37 +18,37 @@
         "elevation_ft": 300
       },
       "current": {
-        "temp": 55.0,
-        "feels_like": 54.2,
-        "humidity": 85,
-        "dew_point": 50.6,
+        "temp": 55.6,
+        "feels_like": 54.9,
+        "humidity": 88,
+        "dew_point": 52.1,
         "weather_code": 3,
         "weather_desc": "Overcast",
         "weather_icon": "\u2601\ufe0f",
-        "is_day": 0,
-        "cloud_cover": 90,
-        "pressure_msl": 1013.5,
-        "surface_pressure": 1003.9,
-        "wind_speed": 2.2,
-        "wind_dir_deg": 174,
+        "is_day": 1,
+        "cloud_cover": 95,
+        "pressure_msl": 1014.0,
+        "surface_pressure": 1004.4,
+        "wind_speed": 3.1,
+        "wind_dir_deg": 180,
         "wind_dir": "S",
-        "wind_gusts": 2.2,
-        "visibility": 44947.508,
+        "wind_gusts": 2.9,
+        "visibility": 45275.588,
         "precipitation": 0.0,
         "rain": 0.0,
         "snowfall": 0.0
       },
       "pressure_trend": {
-        "direction": "falling",
-        "change_3h": -1.2,
-        "arrow": "\u2198"
+        "direction": "falling_fast",
+        "change_3h": -1.6,
+        "arrow": "\u2b07"
       },
       "air_quality": {
-        "us_aqi": 74,
-        "pm2_5": 23.5,
-        "pm10": 23.6,
-        "co": 180.0,
-        "ozone": 36.0
+        "us_aqi": 72,
+        "pm2_5": 22.5,
+        "pm10": 22.6,
+        "co": 186.0,
+        "ozone": 35.0
       },
       "alerts": [],
       "hourly": [
@@ -1110,37 +1110,37 @@
         "elevation_ft": 2844
       },
       "current": {
-        "temp": 73.3,
-        "feels_like": 66.4,
+        "temp": 73.2,
+        "feels_like": 66.2,
         "humidity": 23,
         "dew_point": 33.2,
         "weather_code": 3,
         "weather_desc": "Overcast",
         "weather_icon": "\u2601\ufe0f",
-        "is_day": 0,
+        "is_day": 1,
         "cloud_cover": 100,
-        "pressure_msl": 1012.7,
-        "surface_pressure": 917.7,
-        "wind_speed": 7.6,
+        "pressure_msl": 1012.6,
+        "surface_pressure": 917.6,
+        "wind_speed": 7.9,
         "wind_dir_deg": 137,
         "wind_dir": "SE",
-        "wind_gusts": 7.6,
-        "visibility": 234580.048,
+        "wind_gusts": 7.8,
+        "visibility": 235564.32,
         "precipitation": 0.0,
         "rain": 0.0,
         "snowfall": 0.0
       },
       "pressure_trend": {
-        "direction": "steady",
-        "change_3h": 0.0,
-        "arrow": "\u2192"
+        "direction": "falling",
+        "change_3h": -0.8,
+        "arrow": "\u2198"
       },
       "air_quality": {
         "us_aqi": 54,
-        "pm2_5": 12.2,
-        "pm10": 13.1,
-        "co": 101.0,
-        "ozone": 39.0
+        "pm2_5": 11.8,
+        "pm10": 12.7,
+        "co": 100.0,
+        "ozone": 42.0
       },
       "alerts": [],
       "hourly": [
@@ -2202,37 +2202,37 @@
         "elevation_ft": 4505
       },
       "current": {
-        "temp": 63.3,
-        "feels_like": 58.4,
-        "humidity": 32,
-        "dew_point": 32.9,
+        "temp": 63.5,
+        "feels_like": 58.7,
+        "humidity": 31,
+        "dew_point": 32.3,
         "weather_code": 3,
         "weather_desc": "Overcast",
         "weather_icon": "\u2601\ufe0f",
-        "is_day": 0,
+        "is_day": 1,
         "cloud_cover": 100,
-        "pressure_msl": 1011.0,
-        "surface_pressure": 862.0,
-        "wind_speed": 2.9,
-        "wind_dir_deg": 4,
+        "pressure_msl": 1011.2,
+        "surface_pressure": 862.2,
+        "wind_speed": 2.2,
+        "wind_dir_deg": 360,
         "wind_dir": "N",
-        "wind_gusts": 2.9,
-        "visibility": 175853.008,
+        "wind_gusts": 2.2,
+        "visibility": 173884.512,
         "precipitation": 0.0,
         "rain": 0.0,
         "snowfall": 0.0
       },
       "pressure_trend": {
         "direction": "falling_fast",
-        "change_3h": -1.8,
+        "change_3h": -2.6,
         "arrow": "\u2b07"
       },
       "air_quality": {
         "us_aqi": 51,
-        "pm2_5": 13.9,
-        "pm10": 15.0,
-        "co": 120.0,
-        "ozone": 34.0
+        "pm2_5": 13.7,
+        "pm10": 14.8,
+        "co": 138.0,
+        "ozone": 33.0
       },
       "alerts": [],
       "hourly": [
@@ -3294,37 +3294,37 @@
         "elevation_ft": -282
       },
       "current": {
-        "temp": 96.0,
-        "feels_like": 90.3,
-        "humidity": 16,
-        "dew_point": 42.6,
+        "temp": 97.2,
+        "feels_like": 93.0,
+        "humidity": 17,
+        "dew_point": 45.2,
         "weather_code": 0,
         "weather_desc": "Clear sky",
         "weather_icon": "\u2600\ufe0f",
         "is_day": 1,
         "cloud_cover": 0,
-        "pressure_msl": 1009.2,
-        "surface_pressure": 1015.8,
-        "wind_speed": 9.1,
-        "wind_dir_deg": 118,
-        "wind_dir": "ESE",
-        "wind_gusts": 9.4,
-        "visibility": 280839.904,
+        "pressure_msl": 1010.3,
+        "surface_pressure": 1016.9,
+        "wind_speed": 7.0,
+        "wind_dir_deg": 127,
+        "wind_dir": "SE",
+        "wind_gusts": 8.1,
+        "visibility": 295275.584,
         "precipitation": 0.0,
         "rain": 0.0,
         "snowfall": 0.0
       },
       "pressure_trend": {
         "direction": "falling_fast",
-        "change_3h": -2.0,
+        "change_3h": -2.5,
         "arrow": "\u2b07"
       },
       "air_quality": {
-        "us_aqi": 37,
-        "pm2_5": 7.7,
-        "pm10": 23.7,
+        "us_aqi": 36,
+        "pm2_5": 8.0,
+        "pm10": 23.6,
         "co": 93.0,
-        "ozone": 70.0
+        "ozone": 68.0
       },
       "alerts": [
         {
