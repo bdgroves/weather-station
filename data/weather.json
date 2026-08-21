@@ -1,5 +1,5 @@
 {
-  "generated_utc": "2026-08-21T03:26:35.054494+00:00",
+  "generated_utc": "2026-08-21T04:07:11.324341+00:00",
   "moon": {
     "phase_name": "First Quarter",
     "emoji": "\ud83c\udf13",
@@ -18,22 +18,22 @@
         "elevation_ft": 300
       },
       "current": {
-        "temp": 76.5,
-        "feels_like": 74.0,
-        "humidity": 36,
-        "dew_point": 47.6,
+        "temp": 73.4,
+        "feels_like": 70.8,
+        "humidity": 41,
+        "dew_point": 48.3,
         "weather_code": 0,
         "weather_desc": "Clear sky",
         "weather_icon": "\u2600\ufe0f",
         "is_day": 0,
         "cloud_cover": 0,
-        "pressure_msl": 1012.6,
-        "surface_pressure": 1003.4,
-        "wind_speed": 4.4,
-        "wind_dir_deg": 49,
-        "wind_dir": "NE",
-        "wind_gusts": 12.1,
-        "visibility": 171259.84,
+        "pressure_msl": 1013.6,
+        "surface_pressure": 1004.3,
+        "wind_speed": 5.1,
+        "wind_dir_deg": 61,
+        "wind_dir": "ENE",
+        "wind_gusts": 13.2,
+        "visibility": 154199.472,
         "precipitation": 0.0,
         "rain": 0.0,
         "snowfall": 0.0
@@ -44,11 +44,11 @@
         "arrow": "\u2192"
       },
       "air_quality": {
-        "us_aqi": 81,
-        "pm2_5": 14.8,
-        "pm10": 15.4,
-        "co": 141.0,
-        "ozone": 103.0
+        "us_aqi": 80,
+        "pm2_5": 16.6,
+        "pm10": 17.1,
+        "co": 149.0,
+        "ozone": 87.0
       },
       "alerts": [],
       "hourly": [
@@ -416,8 +416,8 @@
         {
           "time": "2026-08-20T19:00",
           "temp": 83.2,
-          "feels_like": 79.9,
-          "humidity": 30,
+          "feels_like": 80.9,
+          "humidity": 34,
           "precip_prob": 0,
           "precip": 0.0,
           "weather_code": 0,
@@ -429,14 +429,14 @@
           "uv_index": 1.2,
           "visibility": 184383.2,
           "cloud_cover": 0,
-          "dew_point": 48.5,
-          "pressure": 1011.9
+          "dew_point": 51.9,
+          "pressure": 1012.4
         },
         {
           "time": "2026-08-20T20:00",
           "temp": 78.1,
-          "feels_like": 75.6,
-          "humidity": 35,
+          "feels_like": 75.8,
+          "humidity": 36,
           "precip_prob": 0,
           "precip": 0.0,
           "weather_code": 0,
@@ -448,14 +448,14 @@
           "uv_index": 0.3,
           "visibility": 176509.184,
           "cloud_cover": 0,
-          "dew_point": 48.2,
+          "dew_point": 49.0,
           "pressure": 1012.3
         },
         {
           "time": "2026-08-20T21:00",
           "temp": 73.4,
-          "feels_like": 70.7,
-          "humidity": 40,
+          "feels_like": 70.8,
+          "humidity": 41,
           "precip_prob": 0,
           "precip": 0.0,
           "weather_code": 0,
@@ -467,14 +467,14 @@
           "uv_index": 0.0,
           "visibility": 154199.472,
           "cloud_cover": 0,
-          "dew_point": 47.6,
-          "pressure": 1013.7
+          "dew_point": 48.3,
+          "pressure": 1013.6
         },
         {
           "time": "2026-08-20T22:00",
           "temp": 71.2,
-          "feels_like": 66.9,
-          "humidity": 35,
+          "feels_like": 67.9,
+          "humidity": 41,
           "precip_prob": 0,
           "precip": 0.0,
           "weather_code": 0,
@@ -486,14 +486,14 @@
           "uv_index": 0.0,
           "visibility": 154199.472,
           "cloud_cover": 0,
-          "dew_point": 42.1,
-          "pressure": 1013.8
+          "dew_point": 46.3,
+          "pressure": 1014.3
         },
         {
           "time": "2026-08-20T23:00",
           "temp": 68.3,
-          "feels_like": 67.2,
-          "humidity": 47,
+          "feels_like": 67.0,
+          "humidity": 45,
           "precip_prob": 0,
           "precip": 0.0,
           "weather_code": 0,
@@ -505,14 +505,14 @@
           "uv_index": 0.0,
           "visibility": 139435.696,
           "cloud_cover": 0,
-          "dew_point": 47.3,
-          "pressure": 1014.4
+          "dew_point": 46.1,
+          "pressure": 1014.3
         },
         {
           "time": "2026-08-21T00:00",
           "temp": 66.1,
-          "feels_like": 63.5,
-          "humidity": 51,
+          "feels_like": 64.0,
+          "humidity": 55,
           "precip_prob": 0,
           "precip": 0.0,
           "weather_code": 0,
@@ -524,14 +524,14 @@
           "uv_index": 0.0,
           "visibility": 109580.056,
           "cloud_cover": 0,
-          "dew_point": 47.5,
-          "pressure": 1013.9
+          "dew_point": 49.5,
+          "pressure": 1014.1
         },
         {
           "time": "2026-08-21T01:00",
           "temp": 65.1,
-          "feels_like": 62.6,
-          "humidity": 55,
+          "feels_like": 63.1,
+          "humidity": 59,
           "precip_prob": 0,
           "precip": 0.0,
           "weather_code": 0,
@@ -543,14 +543,14 @@
           "uv_index": 0.0,
           "visibility": 99737.528,
           "cloud_cover": 0,
-          "dew_point": 48.5,
+          "dew_point": 50.4,
           "pressure": 1014.0
         },
         {
           "time": "2026-08-21T02:00",
           "temp": 63.5,
-          "feels_like": 62.2,
-          "humidity": 64,
+          "feels_like": 62.3,
+          "humidity": 65,
           "precip_prob": 0,
           "precip": 0.0,
           "weather_code": 0,
@@ -562,33 +562,33 @@
           "uv_index": 0.0,
           "visibility": 84973.76,
           "cloud_cover": 0,
-          "dew_point": 51.1,
-          "pressure": 1014.1
+          "dew_point": 51.6,
+          "pressure": 1014.2
         },
         {
           "time": "2026-08-21T03:00",
           "temp": 61.7,
-          "feels_like": 61.1,
-          "humidity": 67,
+          "feels_like": 61.2,
+          "humidity": 68,
           "precip_prob": 0,
           "precip": 0.0,
-          "weather_code": 2,
-          "weather_desc": "Partly cloudy",
-          "weather_icon": "\u26c5",
+          "weather_code": 0,
+          "weather_desc": "Clear sky",
+          "weather_icon": "\u2600\ufe0f",
           "wind_speed": 2.1,
           "wind_dir": 108,
           "wind_gusts": 3.4,
           "uv_index": 0.0,
           "visibility": 78083.992,
-          "cloud_cover": 58,
-          "dew_point": 50.7,
+          "cloud_cover": 0,
+          "dew_point": 51.1,
           "pressure": 1014.2
         },
         {
           "time": "2026-08-21T04:00",
           "temp": 60.1,
-          "feels_like": 59.7,
-          "humidity": 71,
+          "feels_like": 59.9,
+          "humidity": 73,
           "precip_prob": 0,
           "precip": 0.0,
           "weather_code": 0,
@@ -599,28 +599,28 @@
           "wind_gusts": 6.5,
           "uv_index": 0.0,
           "visibility": 69881.888,
-          "cloud_cover": 0,
-          "dew_point": 50.7,
-          "pressure": 1014.2
+          "cloud_cover": 4,
+          "dew_point": 51.4,
+          "pressure": 1014.4
         },
         {
           "time": "2026-08-21T05:00",
           "temp": 59.0,
-          "feels_like": 58.8,
-          "humidity": 74,
+          "feels_like": 58.9,
+          "humidity": 75,
           "precip_prob": 0,
           "precip": 0.0,
-          "weather_code": 0,
-          "weather_desc": "Clear sky",
-          "weather_icon": "\u2600\ufe0f",
+          "weather_code": 3,
+          "weather_desc": "Overcast",
+          "weather_icon": "\u2601\ufe0f",
           "wind_speed": 1.1,
           "wind_dir": 217,
           "wind_gusts": 5.4,
           "uv_index": 0.0,
           "visibility": 66272.968,
-          "cloud_cover": 0,
-          "dew_point": 50.8,
-          "pressure": 1014.5
+          "cloud_cover": 100,
+          "dew_point": 51.1,
+          "pressure": 1014.3
         },
         {
           "time": "2026-08-21T06:00",
@@ -629,36 +629,36 @@
           "humidity": 75,
           "precip_prob": 0,
           "precip": 0.0,
-          "weather_code": 1,
-          "weather_desc": "Mainly clear",
-          "weather_icon": "\ud83c\udf24\ufe0f",
+          "weather_code": 3,
+          "weather_desc": "Overcast",
+          "weather_icon": "\u2601\ufe0f",
           "wind_speed": 2.5,
           "wind_dir": 260,
           "wind_gusts": 3.4,
           "uv_index": 0.0,
           "visibility": 66601.048,
-          "cloud_cover": 34,
+          "cloud_cover": 100,
           "dew_point": 50.4,
           "pressure": 1014.7
         },
         {
           "time": "2026-08-21T07:00",
           "temp": 58.8,
-          "feels_like": 58.3,
-          "humidity": 76,
+          "feels_like": 58.2,
+          "humidity": 75,
           "precip_prob": 1,
           "precip": 0.0,
-          "weather_code": 1,
-          "weather_desc": "Mainly clear",
-          "weather_icon": "\ud83c\udf24\ufe0f",
+          "weather_code": 3,
+          "weather_desc": "Overcast",
+          "weather_icon": "\u2601\ufe0f",
           "wind_speed": 2.0,
           "wind_dir": 264,
           "wind_gusts": 2.2,
           "uv_index": 0.1,
           "visibility": 65616.796,
-          "cloud_cover": 42,
-          "dew_point": 51.2,
-          "pressure": 1015.0
+          "cloud_cover": 100,
+          "dew_point": 50.9,
+          "pressure": 1014.9
         },
         {
           "time": "2026-08-21T08:00",
@@ -677,13 +677,13 @@
           "visibility": 75131.232,
           "cloud_cover": 100,
           "dew_point": 53.9,
-          "pressure": 1015.3
+          "pressure": 1015.1
         },
         {
           "time": "2026-08-21T09:00",
           "temp": 69.9,
-          "feels_like": 70.4,
-          "humidity": 57,
+          "feels_like": 70.5,
+          "humidity": 58,
           "precip_prob": 1,
           "precip": 0.0,
           "weather_code": 3,
@@ -695,14 +695,14 @@
           "uv_index": 1.7,
           "visibility": 99081.368,
           "cloud_cover": 100,
-          "dew_point": 54.0,
-          "pressure": 1015.4
+          "dew_point": 54.5,
+          "pressure": 1015.2
         },
         {
           "time": "2026-08-21T10:00",
           "temp": 75.1,
-          "feels_like": 75.4,
-          "humidity": 50,
+          "feels_like": 75.2,
+          "humidity": 49,
           "precip_prob": 1,
           "precip": 0.0,
           "weather_code": 3,
@@ -714,65 +714,65 @@
           "uv_index": 2.85,
           "visibility": 123359.576,
           "cloud_cover": 100,
-          "dew_point": 55.2,
-          "pressure": 1015.3
+          "dew_point": 54.7,
+          "pressure": 1015.1
         },
         {
           "time": "2026-08-21T11:00",
-          "temp": 79.4,
-          "feels_like": 79.6,
-          "humidity": 45,
+          "temp": 79.5,
+          "feels_like": 79.3,
+          "humidity": 43,
           "precip_prob": 1,
           "precip": 0.0,
           "weather_code": 3,
           "weather_desc": "Overcast",
           "weather_icon": "\u2601\ufe0f",
-          "wind_speed": 5.3,
-          "wind_dir": 19,
+          "wind_speed": 5.4,
+          "wind_dir": 17,
           "wind_gusts": 6.9,
           "uv_index": 4.2,
-          "visibility": 140501.968,
+          "visibility": 141732.288,
           "cloud_cover": 100,
-          "dew_point": 56.2,
-          "pressure": 1014.9
+          "dew_point": 55.0,
+          "pressure": 1014.7
         },
         {
           "time": "2026-08-21T12:00",
           "temp": 82.3,
-          "feels_like": 82.7,
-          "humidity": 40,
+          "feels_like": 82.3,
+          "humidity": 39,
           "precip_prob": 1,
           "precip": 0.0,
           "weather_code": 3,
           "weather_desc": "Overcast",
           "weather_icon": "\u2601\ufe0f",
           "wind_speed": 5.5,
-          "wind_dir": 23,
-          "wind_gusts": 6.8,
+          "wind_dir": 27,
+          "wind_gusts": 6.9,
           "uv_index": 4.9,
-          "visibility": 156167.984,
+          "visibility": 159448.816,
           "cloud_cover": 100,
-          "dew_point": 55.6,
-          "pressure": 1014.5
+          "dew_point": 54.8,
+          "pressure": 1014.2
         },
         {
           "time": "2026-08-21T13:00",
-          "temp": 85.4,
-          "feels_like": 86.8,
-          "humidity": 36,
+          "temp": 85.3,
+          "feels_like": 86.1,
+          "humidity": 34,
           "precip_prob": 2,
           "precip": 0.0,
           "weather_code": 3,
           "weather_desc": "Overcast",
           "weather_icon": "\u2601\ufe0f",
-          "wind_speed": 5.7,
-          "wind_dir": 24,
-          "wind_gusts": 6.9,
+          "wind_speed": 5.0,
+          "wind_dir": 21,
+          "wind_gusts": 6.0,
           "uv_index": 4.0,
-          "visibility": 171013.776,
+          "visibility": 178149.616,
           "cloud_cover": 100,
-          "dew_point": 55.4,
-          "pressure": 1013.7
+          "dew_point": 53.8,
+          "pressure": 1013.8
         },
         {
           "time": "2026-08-21T14:00",
@@ -1002,7 +1002,7 @@
           "precip_prob_max": 4,
           "wind_max": 10.9,
           "wind_gusts_max": 19.2,
-          "wind_dir_dominant": 307
+          "wind_dir_dominant": 306
         },
         {
           "date": "2026-08-22",
@@ -1110,37 +1110,37 @@
         "elevation_ft": 2844
       },
       "current": {
-        "temp": 77.1,
-        "feels_like": 71.7,
-        "humidity": 21,
+        "temp": 75.8,
+        "feels_like": 70.3,
+        "humidity": 22,
         "dew_point": 34.2,
         "weather_code": 0,
         "weather_desc": "Clear sky",
         "weather_icon": "\u2600\ufe0f",
         "is_day": 0,
         "cloud_cover": 0,
-        "pressure_msl": 1011.8,
-        "surface_pressure": 917.5,
+        "pressure_msl": 1012.1,
+        "surface_pressure": 917.6,
         "wind_speed": 4.7,
-        "wind_dir_deg": 267,
-        "wind_dir": "W",
-        "wind_gusts": 7.4,
-        "visibility": 251312.336,
+        "wind_dir_deg": 245,
+        "wind_dir": "WSW",
+        "wind_gusts": 4.9,
+        "visibility": 248687.664,
         "precipitation": 0.0,
         "rain": 0.0,
         "snowfall": 0.0
       },
       "pressure_trend": {
-        "direction": "falling",
-        "change_3h": -0.6,
-        "arrow": "\u2198"
+        "direction": "steady",
+        "change_3h": 0.3,
+        "arrow": "\u2192"
       },
       "air_quality": {
-        "us_aqi": 81,
-        "pm2_5": 9.9,
-        "pm10": 11.9,
-        "co": 118.0,
-        "ozone": 100.0
+        "us_aqi": 76,
+        "pm2_5": 10.9,
+        "pm10": 13.2,
+        "co": 125.0,
+        "ozone": 86.0
       },
       "alerts": [],
       "hourly": [
@@ -1508,8 +1508,8 @@
         {
           "time": "2026-08-20T19:00",
           "temp": 85.6,
-          "feels_like": 79.5,
-          "humidity": 18,
+          "feels_like": 79.0,
+          "humidity": 16,
           "precip_prob": 0,
           "precip": 0.0,
           "weather_code": 0,
@@ -1521,8 +1521,8 @@
           "uv_index": 1.0,
           "visibility": 284448.8,
           "cloud_cover": 0,
-          "dew_point": 37.3,
-          "pressure": 1011.0
+          "dew_point": 34.3,
+          "pressure": 1010.9
         },
         {
           "time": "2026-08-20T20:00",
@@ -1541,7 +1541,7 @@
           "visibility": 255249.344,
           "cloud_cover": 0,
           "dew_point": 35.1,
-          "pressure": 1011.5
+          "pressure": 1011.6
         },
         {
           "time": "2026-08-20T21:00",
@@ -1560,13 +1560,13 @@
           "visibility": 248687.664,
           "cloud_cover": 0,
           "dew_point": 34.2,
-          "pressure": 1012.5
+          "pressure": 1012.1
         },
         {
           "time": "2026-08-20T22:00",
           "temp": 75.4,
-          "feels_like": 70.6,
-          "humidity": 21,
+          "feels_like": 70.8,
+          "humidity": 22,
           "precip_prob": 0,
           "precip": 0.0,
           "weather_code": 3,
@@ -1578,14 +1578,14 @@
           "uv_index": 0.0,
           "visibility": 250656.176,
           "cloud_cover": 100,
-          "dew_point": 32.8,
+          "dew_point": 33.9,
           "pressure": 1012.0
         },
         {
           "time": "2026-08-20T23:00",
           "temp": 74.6,
-          "feels_like": 67.1,
-          "humidity": 21,
+          "feels_like": 67.3,
+          "humidity": 22,
           "precip_prob": 0,
           "precip": 0.0,
           "weather_code": 3,
@@ -1597,14 +1597,14 @@
           "uv_index": 0.0,
           "visibility": 251312.336,
           "cloud_cover": 100,
-          "dew_point": 32.1,
-          "pressure": 1012.4
+          "dew_point": 33.3,
+          "pressure": 1012.8
         },
         {
           "time": "2026-08-21T00:00",
           "temp": 76.3,
-          "feels_like": 68.7,
-          "humidity": 19,
+          "feels_like": 68.9,
+          "humidity": 20,
           "precip_prob": 0,
           "precip": 0.0,
           "weather_code": 3,
@@ -1616,8 +1616,8 @@
           "uv_index": 0.0,
           "visibility": 261811.024,
           "cloud_cover": 100,
-          "dew_point": 31.0,
-          "pressure": 1012.2
+          "dew_point": 32.3,
+          "pressure": 1013.2
         },
         {
           "time": "2026-08-21T01:00",
@@ -1636,13 +1636,13 @@
           "visibility": 272965.888,
           "cloud_cover": 100,
           "dew_point": 30.4,
-          "pressure": 1012.0
+          "pressure": 1012.7
         },
         {
           "time": "2026-08-21T02:00",
           "temp": 77.1,
-          "feels_like": 69.3,
-          "humidity": 18,
+          "feels_like": 69.5,
+          "humidity": 19,
           "precip_prob": 0,
           "precip": 0.0,
           "weather_code": 3,
@@ -1653,15 +1653,15 @@
           "wind_gusts": 9.4,
           "uv_index": 0.0,
           "visibility": 267060.368,
-          "cloud_cover": 100,
-          "dew_point": 30.3,
-          "pressure": 1012.0
+          "cloud_cover": 94,
+          "dew_point": 31.6,
+          "pressure": 1012.3
         },
         {
           "time": "2026-08-21T03:00",
           "temp": 76.8,
-          "feels_like": 70.3,
-          "humidity": 18,
+          "feels_like": 70.5,
+          "humidity": 19,
           "precip_prob": 0,
           "precip": 0.0,
           "weather_code": 3,
@@ -1673,14 +1673,14 @@
           "uv_index": 0.0,
           "visibility": 270341.216,
           "cloud_cover": 100,
-          "dew_point": 30.1,
-          "pressure": 1012.4
+          "dew_point": 31.4,
+          "pressure": 1012.7
         },
         {
           "time": "2026-08-21T04:00",
           "temp": 75.3,
-          "feels_like": 67.8,
-          "humidity": 18,
+          "feels_like": 68.2,
+          "humidity": 20,
           "precip_prob": 0,
           "precip": 0.0,
           "weather_code": 3,
@@ -1692,14 +1692,14 @@
           "uv_index": 0.0,
           "visibility": 262795.28,
           "cloud_cover": 100,
-          "dew_point": 28.8,
-          "pressure": 1012.6
+          "dew_point": 31.4,
+          "pressure": 1012.9
         },
         {
           "time": "2026-08-21T05:00",
           "temp": 75.0,
-          "feels_like": 67.0,
-          "humidity": 19,
+          "feels_like": 67.2,
+          "humidity": 20,
           "precip_prob": 0,
           "precip": 0.0,
           "weather_code": 3,
@@ -1711,14 +1711,14 @@
           "uv_index": 0.0,
           "visibility": 262467.184,
           "cloud_cover": 100,
-          "dew_point": 29.9,
-          "pressure": 1013.4
+          "dew_point": 31.2,
+          "pressure": 1012.8
         },
         {
           "time": "2026-08-21T06:00",
           "temp": 76.4,
-          "feels_like": 69.0,
-          "humidity": 21,
+          "feels_like": 68.8,
+          "humidity": 20,
           "precip_prob": 0,
           "precip": 0.0,
           "weather_code": 3,
@@ -1730,8 +1730,8 @@
           "uv_index": 0.0,
           "visibility": 260826.784,
           "cloud_cover": 100,
-          "dew_point": 33.6,
-          "pressure": 1013.6
+          "dew_point": 32.4,
+          "pressure": 1013.1
         },
         {
           "time": "2026-08-21T07:00",
@@ -1750,7 +1750,7 @@
           "visibility": 260498.688,
           "cloud_cover": 100,
           "dew_point": 33.3,
-          "pressure": 1014.1
+          "pressure": 1013.5
         },
         {
           "time": "2026-08-21T08:00",
@@ -1769,26 +1769,26 @@
           "visibility": 267060.368,
           "cloud_cover": 100,
           "dew_point": 36.1,
-          "pressure": 1014.3
+          "pressure": 1014.2
         },
         {
           "time": "2026-08-21T09:00",
           "temp": 86.2,
-          "feels_like": 82.3,
-          "humidity": 17,
+          "feels_like": 82.6,
+          "humidity": 18,
           "precip_prob": 0,
           "precip": 0.0,
-          "weather_code": 1,
-          "weather_desc": "Mainly clear",
-          "weather_icon": "\ud83c\udf24\ufe0f",
+          "weather_code": 3,
+          "weather_desc": "Overcast",
+          "weather_icon": "\u2601\ufe0f",
           "wind_speed": 1.9,
           "wind_dir": 69,
           "wind_gusts": 6.9,
           "uv_index": 2.1,
           "visibility": 274606.304,
-          "cloud_cover": 28,
-          "dew_point": 36.3,
-          "pressure": 1014.0
+          "cloud_cover": 100,
+          "dew_point": 37.8,
+          "pressure": 1014.2
         },
         {
           "time": "2026-08-21T10:00",
@@ -1807,64 +1807,64 @@
           "visibility": 277559.072,
           "cloud_cover": 100,
           "dew_point": 39.0,
-          "pressure": 1014.0
+          "pressure": 1014.1
         },
         {
           "time": "2026-08-21T11:00",
-          "temp": 90.4,
-          "feels_like": 85.0,
-          "humidity": 17,
+          "temp": 90.5,
+          "feels_like": 85.3,
+          "humidity": 18,
           "precip_prob": 0,
           "precip": 0.0,
-          "weather_code": 0,
-          "weather_desc": "Clear sky",
-          "weather_icon": "\u2600\ufe0f",
-          "wind_speed": 10.4,
-          "wind_dir": 248,
+          "weather_code": 3,
+          "weather_desc": "Overcast",
+          "weather_icon": "\u2601\ufe0f",
+          "wind_speed": 10.6,
+          "wind_dir": 249,
           "wind_gusts": 12.1,
           "uv_index": 5.2,
-          "visibility": 275508.544,
-          "cloud_cover": 0,
-          "dew_point": 39.7,
-          "pressure": 1014.3
+          "visibility": 274606.304,
+          "cloud_cover": 100,
+          "dew_point": 41.2,
+          "pressure": 1014.4
         },
         {
           "time": "2026-08-21T12:00",
-          "temp": 90.6,
+          "temp": 90.4,
           "feels_like": 87.1,
+          "humidity": 19,
+          "precip_prob": 0,
+          "precip": 0.0,
+          "weather_code": 1,
+          "weather_desc": "Mainly clear",
+          "weather_icon": "\ud83c\udf24\ufe0f",
+          "wind_speed": 10.0,
+          "wind_dir": 258,
+          "wind_gusts": 11.4,
+          "uv_index": 6.45,
+          "visibility": 267388.464,
+          "cloud_cover": 21,
+          "dew_point": 42.5,
+          "pressure": 1014.7
+        },
+        {
+          "time": "2026-08-21T13:00",
+          "temp": 90.8,
+          "feels_like": 87.8,
           "humidity": 18,
           "precip_prob": 1,
           "precip": 0.0,
           "weather_code": 1,
           "weather_desc": "Mainly clear",
           "weather_icon": "\ud83c\udf24\ufe0f",
-          "wind_speed": 10.0,
-          "wind_dir": 255,
-          "wind_gusts": 11.5,
-          "uv_index": 6.45,
-          "visibility": 270505.248,
-          "cloud_cover": 23,
-          "dew_point": 41.3,
-          "pressure": 1014.6
-        },
-        {
-          "time": "2026-08-21T13:00",
-          "temp": 90.6,
-          "feels_like": 87.9,
-          "humidity": 19,
-          "precip_prob": 1,
-          "precip": 0.0,
-          "weather_code": 1,
-          "weather_desc": "Mainly clear",
-          "weather_icon": "\ud83c\udf24\ufe0f",
-          "wind_speed": 10.1,
+          "wind_speed": 10.5,
           "wind_dir": 259,
-          "wind_gusts": 11.4,
+          "wind_gusts": 12.1,
           "uv_index": 7.2,
-          "visibility": 264681.744,
-          "cloud_cover": 39,
-          "dew_point": 42.7,
-          "pressure": 1014.6
+          "visibility": 269356.96,
+          "cloud_cover": 21,
+          "dew_point": 41.5,
+          "pressure": 1015.1
         },
         {
           "time": "2026-08-21T14:00",
@@ -2082,19 +2082,19 @@
           "weather_code": 3,
           "weather_desc": "Overcast",
           "weather_icon": "\u2601\ufe0f",
-          "temp_max": 90.6,
+          "temp_max": 90.8,
           "temp_min": 73.8,
           "feels_max": 88.1,
-          "feels_min": 67.0,
+          "feels_min": 67.2,
           "sunrise": "2026-08-21T06:21",
           "sunset": "2026-08-21T19:45",
           "daylight_hrs": 13.4,
           "uv_max": 7.2,
           "precip_sum": 0.0,
           "precip_prob_max": 3,
-          "wind_max": 10.4,
+          "wind_max": 10.6,
           "wind_gusts_max": 12.1,
-          "wind_dir_dominant": 217
+          "wind_dir_dominant": 218
         },
         {
           "date": "2026-08-22",
@@ -2202,37 +2202,37 @@
         "elevation_ft": 4505
       },
       "current": {
-        "temp": 81.6,
-        "feels_like": 71.0,
-        "humidity": 17,
+        "temp": 79.8,
+        "feels_like": 68.9,
+        "humidity": 18,
         "dew_point": 32.5,
         "weather_code": 0,
         "weather_desc": "Clear sky",
         "weather_icon": "\u2600\ufe0f",
         "is_day": 0,
         "cloud_cover": 0,
-        "pressure_msl": 1009.9,
-        "surface_pressure": 865.6,
-        "wind_speed": 16.1,
-        "wind_dir_deg": 297,
+        "pressure_msl": 1010.6,
+        "surface_pressure": 865.8,
+        "wind_speed": 16.8,
+        "wind_dir_deg": 299,
         "wind_dir": "WNW",
-        "wind_gusts": 25.5,
-        "visibility": 282480.32,
+        "wind_gusts": 26.6,
+        "visibility": 274606.304,
         "precipitation": 0.0,
         "rain": 0.0,
         "snowfall": 0.0
       },
       "pressure_trend": {
         "direction": "steady",
-        "change_3h": 0.2,
+        "change_3h": 0.1,
         "arrow": "\u2192"
       },
       "air_quality": {
-        "us_aqi": 45,
-        "pm2_5": 8.2,
-        "pm10": 8.8,
-        "co": 116.0,
-        "ozone": 81.0
+        "us_aqi": 44,
+        "pm2_5": 9.4,
+        "pm10": 10.1,
+        "co": 141.0,
+        "ozone": 69.0
       },
       "alerts": [],
       "hourly": [
@@ -2600,8 +2600,8 @@
         {
           "time": "2026-08-20T19:00",
           "temp": 88.0,
-          "feels_like": 78.2,
-          "humidity": 13,
+          "feels_like": 78.5,
+          "humidity": 14,
           "precip_prob": 0,
           "precip": 0.0,
           "weather_code": 0,
@@ -2612,9 +2612,9 @@
           "wind_gusts": 21.9,
           "uv_index": 0.95,
           "visibility": 295275.584,
-          "cloud_cover": 3,
-          "dew_point": 31.0,
-          "pressure": 1008.5
+          "cloud_cover": 0,
+          "dew_point": 32.9,
+          "pressure": 1008.4
         },
         {
           "time": "2026-08-20T20:00",
@@ -2633,7 +2633,7 @@
           "visibility": 286745.408,
           "cloud_cover": 0,
           "dew_point": 31.8,
-          "pressure": 1009.6
+          "pressure": 1009.4
         },
         {
           "time": "2026-08-20T21:00",
@@ -2650,9 +2650,9 @@
           "wind_gusts": 26.6,
           "uv_index": 0.0,
           "visibility": 274606.304,
-          "cloud_cover": 1,
+          "cloud_cover": 0,
           "dew_point": 32.5,
-          "pressure": 1010.9
+          "pressure": 1010.6
         },
         {
           "time": "2026-08-20T22:00",
@@ -2669,7 +2669,7 @@
           "wind_gusts": 23.5,
           "uv_index": 0.0,
           "visibility": 273622.048,
-          "cloud_cover": 0,
+          "cloud_cover": 6,
           "dew_point": 31.5,
           "pressure": 1010.7
         },
@@ -2680,23 +2680,23 @@
           "humidity": 19,
           "precip_prob": 0,
           "precip": 0.0,
-          "weather_code": 0,
-          "weather_desc": "Clear sky",
-          "weather_icon": "\u2600\ufe0f",
+          "weather_code": 3,
+          "weather_desc": "Overcast",
+          "weather_icon": "\u2601\ufe0f",
           "wind_speed": 2.2,
           "wind_dir": 225,
           "wind_gusts": 7.6,
           "uv_index": 0.0,
           "visibility": 266404.192,
-          "cloud_cover": 11,
+          "cloud_cover": 87,
           "dew_point": 29.7,
-          "pressure": 1011.0
+          "pressure": 1011.2
         },
         {
           "time": "2026-08-21T00:00",
           "temp": 71.1,
-          "feels_like": 64.5,
-          "humidity": 21,
+          "feels_like": 64.6,
+          "humidity": 22,
           "precip_prob": 0,
           "precip": 0.0,
           "weather_code": 3,
@@ -2708,8 +2708,8 @@
           "uv_index": 0.0,
           "visibility": 247703.408,
           "cloud_cover": 100,
-          "dew_point": 29.2,
-          "pressure": 1010.7
+          "dew_point": 30.3,
+          "pressure": 1011.4
         },
         {
           "time": "2026-08-21T01:00",
@@ -2728,7 +2728,7 @@
           "visibility": 246063.008,
           "cloud_cover": 100,
           "dew_point": 28.9,
-          "pressure": 1010.8
+          "pressure": 1011.0
         },
         {
           "time": "2026-08-21T02:00",
@@ -2747,7 +2747,7 @@
           "visibility": 253937.008,
           "cloud_cover": 100,
           "dew_point": 27.8,
-          "pressure": 1010.8
+          "pressure": 1011.0
         },
         {
           "time": "2026-08-21T03:00",
@@ -2771,8 +2771,8 @@
         {
           "time": "2026-08-21T04:00",
           "temp": 67.4,
-          "feels_like": 62.3,
-          "humidity": 23,
+          "feels_like": 62.2,
+          "humidity": 22,
           "precip_prob": 0,
           "precip": 0.0,
           "weather_code": 3,
@@ -2784,8 +2784,8 @@
           "uv_index": 0.0,
           "visibility": 246391.072,
           "cloud_cover": 100,
-          "dew_point": 28.3,
-          "pressure": 1011.2
+          "dew_point": 27.2,
+          "pressure": 1011.5
         },
         {
           "time": "2026-08-21T05:00",
@@ -2804,7 +2804,7 @@
           "visibility": 243438.336,
           "cloud_cover": 100,
           "dew_point": 27.5,
-          "pressure": 1011.9
+          "pressure": 1011.5
         },
         {
           "time": "2026-08-21T06:00",
@@ -2823,13 +2823,13 @@
           "visibility": 242782.16,
           "cloud_cover": 100,
           "dew_point": 27.3,
-          "pressure": 1012.3
+          "pressure": 1012.0
         },
         {
           "time": "2026-08-21T07:00",
           "temp": 66.3,
-          "feels_like": 61.2,
-          "humidity": 24,
+          "feels_like": 61.0,
+          "humidity": 23,
           "precip_prob": 0,
           "precip": 0.0,
           "weather_code": 3,
@@ -2841,8 +2841,8 @@
           "uv_index": 0.1,
           "visibility": 240485.568,
           "cloud_cover": 100,
-          "dew_point": 28.4,
-          "pressure": 1013.1
+          "dew_point": 27.3,
+          "pressure": 1012.8
         },
         {
           "time": "2026-08-21T08:00",
@@ -2861,7 +2861,7 @@
           "visibility": 241797.904,
           "cloud_cover": 100,
           "dew_point": 32.1,
-          "pressure": 1013.4
+          "pressure": 1013.6
         },
         {
           "time": "2026-08-21T09:00",
@@ -2880,7 +2880,7 @@
           "visibility": 259514.432,
           "cloud_cover": 100,
           "dew_point": 33.5,
-          "pressure": 1013.2
+          "pressure": 1013.5
         },
         {
           "time": "2026-08-21T10:00",
@@ -2899,64 +2899,64 @@
           "visibility": 270341.216,
           "cloud_cover": 100,
           "dew_point": 34.6,
-          "pressure": 1013.1
+          "pressure": 1013.5
         },
         {
           "time": "2026-08-21T11:00",
-          "temp": 86.5,
-          "feels_like": 84.3,
-          "humidity": 16,
-          "precip_prob": 1,
+          "temp": 86.4,
+          "feels_like": 84.5,
+          "humidity": 17,
+          "precip_prob": 0,
           "precip": 0.0,
           "weather_code": 3,
           "weather_desc": "Overcast",
           "weather_icon": "\u2601\ufe0f",
-          "wind_speed": 1.6,
-          "wind_dir": 94,
+          "wind_speed": 1.4,
+          "wind_dir": 99,
           "wind_gusts": 12.1,
           "uv_index": 5.25,
-          "visibility": 281414.016,
+          "visibility": 280511.808,
           "cloud_cover": 100,
-          "dew_point": 35.0,
-          "pressure": 1013.1
+          "dew_point": 36.5,
+          "pressure": 1013.4
         },
         {
           "time": "2026-08-21T12:00",
-          "temp": 91.2,
-          "feels_like": 90.1,
-          "humidity": 15,
+          "temp": 91.6,
+          "feels_like": 89.9,
+          "humidity": 14,
           "precip_prob": 1,
           "precip": 0.0,
           "weather_code": 3,
           "weather_desc": "Overcast",
           "weather_icon": "\u2601\ufe0f",
-          "wind_speed": 2.6,
-          "wind_dir": 124,
-          "wind_gusts": 12.8,
+          "wind_speed": 3.8,
+          "wind_dir": 135,
+          "wind_gusts": 13.2,
           "uv_index": 6.0,
-          "visibility": 294947.488,
+          "visibility": 295275.584,
           "cloud_cover": 100,
-          "dew_point": 37.1,
-          "pressure": 1012.8
+          "dew_point": 35.6,
+          "pressure": 1013.0
         },
         {
           "time": "2026-08-21T13:00",
-          "temp": 93.3,
-          "feels_like": 88.9,
+          "temp": 93.4,
+          "feels_like": 88.4,
           "humidity": 14,
           "precip_prob": 2,
           "precip": 0.0,
           "weather_code": 3,
           "weather_desc": "Overcast",
           "weather_icon": "\u2601\ufe0f",
-          "wind_speed": 11.1,
-          "wind_dir": 164,
-          "wind_gusts": 17.4,
+          "wind_speed": 12.2,
+          "wind_dir": 163,
+          "wind_gusts": 17.2,
           "uv_index": 5.8,
           "visibility": 295275.584,
-          "cloud_cover": 90,
-          "dew_point": 37.0,
-          "pressure": 1012.0
+          "cloud_cover": 100,
+          "dew_point": 37.1,
+          "pressure": 1012.4
         },
         {
           "time": "2026-08-21T14:00",
@@ -3186,7 +3186,7 @@
           "precip_prob_max": 3,
           "wind_max": 17.7,
           "wind_gusts_max": 27.5,
-          "wind_dir_dominant": 257
+          "wind_dir_dominant": 255
         },
         {
           "date": "2026-08-22",
@@ -3294,21 +3294,21 @@
         "elevation_ft": -282
       },
       "current": {
-        "temp": 110.5,
-        "feels_like": 103.3,
-        "humidity": 10,
-        "dew_point": 41.6,
+        "temp": 108.9,
+        "feels_like": 102.2,
+        "humidity": 11,
+        "dew_point": 42.9,
         "weather_code": 0,
         "weather_desc": "Clear sky",
         "weather_icon": "\u2600\ufe0f",
         "is_day": 0,
-        "cloud_cover": 1,
-        "pressure_msl": 1006.0,
-        "surface_pressure": 1012.4,
-        "wind_speed": 12.2,
-        "wind_dir_deg": 162,
+        "cloud_cover": 0,
+        "pressure_msl": 1006.5,
+        "surface_pressure": 1012.9,
+        "wind_speed": 11.5,
+        "wind_dir_deg": 148,
         "wind_dir": "SSE",
-        "wind_gusts": 18.3,
+        "wind_gusts": 13.9,
         "visibility": 295275.584,
         "precipitation": 0.0,
         "rain": 0.0,
@@ -3316,13 +3316,13 @@
       },
       "pressure_trend": {
         "direction": "rising",
-        "change_3h": 0.6,
+        "change_3h": 1.0,
         "arrow": "\u2197"
       },
       "air_quality": {
         "us_aqi": 39,
-        "pm2_5": 4.9,
-        "pm10": 14.4,
+        "pm2_5": 5.3,
+        "pm10": 15.7,
         "co": 91.0,
         "ozone": 85.0
       },
@@ -3717,15 +3717,15 @@
           "wind_gusts": 22.6,
           "uv_index": 0.65,
           "visibility": 295275.584,
-          "cloud_cover": 5,
+          "cloud_cover": 0,
           "dew_point": 44.9,
-          "pressure": 1005.1
+          "pressure": 1004.9
         },
         {
           "time": "2026-08-20T20:00",
           "temp": 110.9,
-          "feels_like": 103.8,
-          "humidity": 10,
+          "feels_like": 104.9,
+          "humidity": 12,
           "precip_prob": 0,
           "precip": 0.0,
           "weather_code": 0,
@@ -3736,15 +3736,15 @@
           "wind_gusts": 18.6,
           "uv_index": 0.05,
           "visibility": 295275.584,
-          "cloud_cover": 1,
-          "dew_point": 41.9,
-          "pressure": 1005.8
+          "cloud_cover": 6,
+          "dew_point": 46.7,
+          "pressure": 1005.9
         },
         {
           "time": "2026-08-20T21:00",
           "temp": 108.9,
-          "feels_like": 101.7,
-          "humidity": 10,
+          "feels_like": 102.2,
+          "humidity": 11,
           "precip_prob": 0,
           "precip": 0.0,
           "weather_code": 0,
@@ -3755,15 +3755,15 @@
           "wind_gusts": 13.9,
           "uv_index": 0.0,
           "visibility": 295275.584,
-          "cloud_cover": 1,
-          "dew_point": 40.4,
-          "pressure": 1006.8
+          "cloud_cover": 0,
+          "dew_point": 42.9,
+          "pressure": 1006.5
         },
         {
           "time": "2026-08-20T22:00",
           "temp": 107.7,
-          "feels_like": 101.0,
-          "humidity": 14,
+          "feels_like": 100.4,
+          "humidity": 13,
           "precip_prob": 0,
           "precip": 0.0,
           "weather_code": 0,
@@ -3775,14 +3775,14 @@
           "uv_index": 0.0,
           "visibility": 295275.584,
           "cloud_cover": 0,
-          "dew_point": 48.4,
-          "pressure": 1007.9
+          "dew_point": 46.4,
+          "pressure": 1008.1
         },
         {
           "time": "2026-08-20T23:00",
           "temp": 105.0,
-          "feels_like": 100.5,
-          "humidity": 13,
+          "feels_like": 101.4,
+          "humidity": 15,
           "precip_prob": 0,
           "precip": 0.0,
           "weather_code": 0,
@@ -3794,34 +3794,34 @@
           "uv_index": 0.0,
           "visibility": 295275.584,
           "cloud_cover": 0,
-          "dew_point": 44.3,
-          "pressure": 1007.5
+          "dew_point": 48.1,
+          "pressure": 1008.0
         },
         {
           "time": "2026-08-21T00:00",
           "temp": 102.4,
-          "feels_like": 99.0,
-          "humidity": 12,
+          "feels_like": 99.5,
+          "humidity": 13,
           "precip_prob": 0,
           "precip": 0.0,
-          "weather_code": 3,
-          "weather_desc": "Overcast",
-          "weather_icon": "\u2601\ufe0f",
+          "weather_code": 0,
+          "weather_desc": "Clear sky",
+          "weather_icon": "\u2600\ufe0f",
           "wind_speed": 2.4,
           "wind_dir": 131,
           "wind_gusts": 2.9,
           "uv_index": 0.0,
           "visibility": 293307.104,
-          "cloud_cover": 85,
-          "dew_point": 40.2,
-          "pressure": 1007.5
+          "cloud_cover": 6,
+          "dew_point": 42.3,
+          "pressure": 1008.3
         },
         {
           "time": "2026-08-21T01:00",
           "temp": 101.1,
           "feels_like": 97.2,
           "humidity": 12,
-          "precip_prob": 1,
+          "precip_prob": 0,
           "precip": 0.0,
           "weather_code": 3,
           "weather_desc": "Overcast",
@@ -3831,9 +3831,9 @@
           "wind_gusts": 3.8,
           "uv_index": 0.0,
           "visibility": 295275.584,
-          "cloud_cover": 100,
+          "cloud_cover": 95,
           "dew_point": 39.1,
-          "pressure": 1008.0
+          "pressure": 1008.4
         },
         {
           "time": "2026-08-21T02:00",
@@ -3859,7 +3859,7 @@
           "temp": 100.4,
           "feels_like": 97.2,
           "humidity": 12,
-          "precip_prob": 1,
+          "precip_prob": 2,
           "precip": 0.0,
           "weather_code": 3,
           "weather_desc": "Overcast",
@@ -3871,26 +3871,26 @@
           "visibility": 295275.584,
           "cloud_cover": 100,
           "dew_point": 38.6,
-          "pressure": 1009.0
+          "pressure": 1009.1
         },
         {
           "time": "2026-08-21T04:00",
           "temp": 99.7,
-          "feels_like": 96.0,
-          "humidity": 12,
+          "feels_like": 96.4,
+          "humidity": 13,
           "precip_prob": 1,
           "precip": 0.0,
-          "weather_code": 3,
-          "weather_desc": "Overcast",
-          "weather_icon": "\u2601\ufe0f",
+          "weather_code": 2,
+          "weather_desc": "Partly cloudy",
+          "weather_icon": "\u26c5",
           "wind_speed": 2.2,
           "wind_dir": 156,
           "wind_gusts": 5.4,
           "uv_index": 0.0,
           "visibility": 295275.584,
-          "cloud_cover": 100,
-          "dew_point": 38.1,
-          "pressure": 1009.2
+          "cloud_cover": 67,
+          "dew_point": 40.2,
+          "pressure": 1009.7
         },
         {
           "time": "2026-08-21T05:00",
@@ -3907,28 +3907,28 @@
           "wind_gusts": 8.5,
           "uv_index": 0.0,
           "visibility": 295275.584,
-          "cloud_cover": 16,
+          "cloud_cover": 3,
           "dew_point": 40.2,
-          "pressure": 1010.1
+          "pressure": 1009.8
         },
         {
           "time": "2026-08-21T06:00",
           "temp": 96.4,
-          "feels_like": 93.2,
-          "humidity": 15,
+          "feels_like": 92.8,
+          "humidity": 14,
           "precip_prob": 1,
           "precip": 0.0,
-          "weather_code": 3,
-          "weather_desc": "Overcast",
-          "weather_icon": "\u2601\ufe0f",
+          "weather_code": 0,
+          "weather_desc": "Clear sky",
+          "weather_icon": "\u2600\ufe0f",
           "wind_speed": 2.6,
           "wind_dir": 128,
           "wind_gusts": 4.3,
           "uv_index": 0.0,
           "visibility": 295275.584,
-          "cloud_cover": 90,
-          "dew_point": 41.2,
-          "pressure": 1011.1
+          "cloud_cover": 7,
+          "dew_point": 39.5,
+          "pressure": 1010.8
         },
         {
           "time": "2026-08-21T07:00",
@@ -3937,23 +3937,23 @@
           "humidity": 16,
           "precip_prob": 1,
           "precip": 0.0,
-          "weather_code": 3,
-          "weather_desc": "Overcast",
-          "weather_icon": "\u2601\ufe0f",
+          "weather_code": 0,
+          "weather_desc": "Clear sky",
+          "weather_icon": "\u2600\ufe0f",
           "wind_speed": 7.0,
           "wind_dir": 140,
           "wind_gusts": 11.6,
           "uv_index": 0.15,
           "visibility": 295275.584,
-          "cloud_cover": 82,
+          "cloud_cover": 0,
           "dew_point": 42.4,
-          "pressure": 1011.8
+          "pressure": 1011.7
         },
         {
           "time": "2026-08-21T08:00",
           "temp": 96.9,
-          "feels_like": 94.0,
-          "humidity": 19,
+          "feels_like": 94.4,
+          "humidity": 20,
           "precip_prob": 1,
           "precip": 0.0,
           "weather_code": 0,
@@ -3965,8 +3965,8 @@
           "uv_index": 1.1,
           "visibility": 268044.624,
           "cloud_cover": 0,
-          "dew_point": 47.9,
-          "pressure": 1012.3
+          "dew_point": 49.3,
+          "pressure": 1012.4
         },
         {
           "time": "2026-08-21T09:00",
@@ -3985,14 +3985,14 @@
           "visibility": 285104.992,
           "cloud_cover": 0,
           "dew_point": 49.6,
-          "pressure": 1012.0
+          "pressure": 1012.4
         },
         {
           "time": "2026-08-21T10:00",
           "temp": 106.5,
           "feels_like": 106.0,
           "humidity": 14,
-          "precip_prob": 1,
+          "precip_prob": 0,
           "precip": 0.0,
           "weather_code": 0,
           "weather_desc": "Clear sky",
@@ -4004,30 +4004,30 @@
           "visibility": 295275.584,
           "cloud_cover": 0,
           "dew_point": 47.4,
-          "pressure": 1011.7
+          "pressure": 1012.1
         },
         {
           "time": "2026-08-21T11:00",
-          "temp": 110.2,
-          "feels_like": 109.5,
-          "humidity": 11,
+          "temp": 110.4,
+          "feels_like": 110.4,
+          "humidity": 12,
           "precip_prob": 1,
           "precip": 0.0,
           "weather_code": 0,
           "weather_desc": "Clear sky",
           "weather_icon": "\u2600\ufe0f",
-          "wind_speed": 3.7,
-          "wind_dir": 204,
-          "wind_gusts": 8.6,
+          "wind_speed": 3.3,
+          "wind_dir": 208,
+          "wind_gusts": 8.3,
           "uv_index": 6.2,
           "visibility": 295275.584,
           "cloud_cover": 0,
-          "dew_point": 43.9,
-          "pressure": 1011.6
+          "dew_point": 46.3,
+          "pressure": 1011.7
         },
         {
           "time": "2026-08-21T12:00",
-          "temp": 113.3,
+          "temp": 113.2,
           "feels_like": 112.9,
           "humidity": 10,
           "precip_prob": 1,
@@ -4036,32 +4036,32 @@
           "weather_desc": "Clear sky",
           "weather_icon": "\u2600\ufe0f",
           "wind_speed": 5.2,
-          "wind_dir": 200,
-          "wind_gusts": 10.8,
+          "wind_dir": 205,
+          "wind_gusts": 10.5,
           "uv_index": 7.4,
-          "visibility": 280675.84,
-          "cloud_cover": 14,
+          "visibility": 266076.128,
+          "cloud_cover": 0,
           "dew_point": 43.7,
-          "pressure": 1011.2
+          "pressure": 1011.4
         },
         {
           "time": "2026-08-21T13:00",
-          "temp": 115.1,
-          "feels_like": 115.6,
-          "humidity": 10,
+          "temp": 116.5,
+          "feels_like": 114.7,
+          "humidity": 9,
           "precip_prob": 1,
           "precip": 0.0,
-          "weather_code": 3,
-          "weather_desc": "Overcast",
-          "weather_icon": "\u2601\ufe0f",
-          "wind_speed": 4.9,
-          "wind_dir": 226,
-          "wind_gusts": 8.0,
+          "weather_code": 0,
+          "weather_desc": "Clear sky",
+          "weather_icon": "\u2600\ufe0f",
+          "wind_speed": 8.6,
+          "wind_dir": 208,
+          "wind_gusts": 10.5,
           "uv_index": 7.95,
-          "visibility": 273457.984,
-          "cloud_cover": 100,
-          "dew_point": 45.0,
-          "pressure": 1011.1
+          "visibility": 208005.248,
+          "cloud_cover": 7,
+          "dew_point": 43.3,
+          "pressure": 1011.0
         },
         {
           "time": "2026-08-21T14:00",
@@ -4281,7 +4281,7 @@
           "weather_icon": "\u2601\ufe0f",
           "temp_max": 116.5,
           "temp_min": 95.8,
-          "feels_max": 115.6,
+          "feels_max": 115.0,
           "feels_min": 90.9,
           "sunrise": "2026-08-21T06:10",
           "sunset": "2026-08-21T19:30",
