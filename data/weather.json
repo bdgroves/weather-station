@@ -1,5 +1,5 @@
 {
-  "generated_utc": "2026-08-23T05:51:23.803139+00:00",
+  "generated_utc": "2026-08-23T06:19:59.231712+00:00",
   "moon": {
     "phase_name": "Waxing Gibbous",
     "emoji": "\ud83c\udf14",
@@ -18,37 +18,37 @@
         "elevation_ft": 300
       },
       "current": {
-        "temp": 61.5,
-        "feels_like": 61.2,
-        "humidity": 76,
-        "dew_point": 53.8,
+        "temp": 60.7,
+        "feels_like": 60.5,
+        "humidity": 80,
+        "dew_point": 54.4,
         "weather_code": 0,
         "weather_desc": "Clear sky",
         "weather_icon": "\u2600\ufe0f",
         "is_day": 0,
-        "cloud_cover": 0,
+        "cloud_cover": 17,
         "pressure_msl": 1017.9,
         "surface_pressure": 1008.3,
-        "wind_speed": 3.5,
-        "wind_dir_deg": 252,
+        "wind_speed": 3.7,
+        "wind_dir_deg": 253,
         "wind_dir": "WSW",
-        "wind_gusts": 12.3,
-        "visibility": 64632.548,
+        "wind_gusts": 13.4,
+        "visibility": 58398.948,
         "precipitation": 0.0,
         "rain": 0.0,
         "snowfall": 0.0
       },
       "pressure_trend": {
         "direction": "steady",
-        "change_3h": 0.5,
+        "change_3h": 0.3,
         "arrow": "\u2192"
       },
       "air_quality": {
-        "us_aqi": 60,
-        "pm2_5": 13.3,
-        "pm10": 13.9,
-        "co": 98.0,
-        "ozone": 42.0
+        "us_aqi": 59,
+        "pm2_5": 12.5,
+        "pm10": 13.0,
+        "co": 100.0,
+        "ozone": 38.0
       },
       "alerts": [],
       "hourly": [
@@ -551,7 +551,7 @@
           "temp": 62.3,
           "feels_like": 62.6,
           "humidity": 80,
-          "precip_prob": 2,
+          "precip_prob": 1,
           "precip": 0.0,
           "weather_code": 3,
           "weather_desc": "Overcast",
@@ -608,7 +608,7 @@
           "temp": 61.2,
           "feels_like": 62.2,
           "humidity": 83,
-          "precip_prob": 3,
+          "precip_prob": 2,
           "precip": 0.0,
           "weather_code": 3,
           "weather_desc": "Overcast",
@@ -627,7 +627,7 @@
           "temp": 61.4,
           "feels_like": 62.8,
           "humidity": 85,
-          "precip_prob": 4,
+          "precip_prob": 3,
           "precip": 0.0,
           "weather_code": 3,
           "weather_desc": "Overcast",
@@ -779,7 +779,7 @@
           "temp": 73.5,
           "feels_like": 75.0,
           "humidity": 54,
-          "precip_prob": 3,
+          "precip_prob": 2,
           "precip": 0.0,
           "weather_code": 1,
           "weather_desc": "Mainly clear",
@@ -999,7 +999,7 @@
           "daylight_hrs": 13.8,
           "uv_max": 4.15,
           "precip_sum": 0.0,
-          "precip_prob_max": 4,
+          "precip_prob_max": 3,
           "wind_max": 7.4,
           "wind_gusts_max": 17.9,
           "wind_dir_dominant": 319
@@ -1020,7 +1020,7 @@
           "precip_sum": 0.0,
           "precip_prob_max": 2,
           "wind_max": 10.8,
-          "wind_gusts_max": 21.7,
+          "wind_gusts_max": 22.4,
           "wind_dir_dominant": 37
         },
         {
@@ -1039,7 +1039,7 @@
           "precip_sum": 0.0,
           "precip_prob_max": 8,
           "wind_max": 13.0,
-          "wind_gusts_max": 26.4,
+          "wind_gusts_max": 25.5,
           "wind_dir_dominant": 264
         },
         {
@@ -1058,7 +1058,7 @@
           "precip_sum": 0.0,
           "precip_prob_max": 16,
           "wind_max": 11.1,
-          "wind_gusts_max": 18.3,
+          "wind_gusts_max": 19.0,
           "wind_dir_dominant": 243
         },
         {
@@ -1077,7 +1077,7 @@
           "precip_sum": 0.0,
           "precip_prob_max": 6,
           "wind_max": 8.5,
-          "wind_gusts_max": 17.4,
+          "wind_gusts_max": 16.6,
           "wind_dir_dominant": 241
         },
         {
@@ -1096,7 +1096,7 @@
           "precip_sum": 0.0,
           "precip_prob_max": 1,
           "wind_max": 5.2,
-          "wind_gusts_max": 13.4,
+          "wind_gusts_max": 9.6,
           "wind_dir_dominant": 253
         }
       ]
@@ -1110,37 +1110,37 @@
         "elevation_ft": 2844
       },
       "current": {
-        "temp": 71.6,
-        "feels_like": 65.2,
+        "temp": 71.2,
+        "feels_like": 65.0,
         "humidity": 24,
-        "dew_point": 32.9,
+        "dew_point": 32.6,
         "weather_code": 0,
         "weather_desc": "Clear sky",
         "weather_icon": "\u2600\ufe0f",
         "is_day": 0,
-        "cloud_cover": 0,
+        "cloud_cover": 2,
         "pressure_msl": 1012.9,
-        "surface_pressure": 917.6,
-        "wind_speed": 6.4,
-        "wind_dir_deg": 252,
+        "surface_pressure": 917.5,
+        "wind_speed": 5.8,
+        "wind_dir_deg": 242,
         "wind_dir": "WSW",
-        "wind_gusts": 6.3,
-        "visibility": 235892.384,
+        "wind_gusts": 5.8,
+        "visibility": 238188.992,
         "precipitation": 0.0,
         "rain": 0.0,
         "snowfall": 0.0
       },
       "pressure_trend": {
         "direction": "steady",
-        "change_3h": -0.1,
+        "change_3h": 0.5,
         "arrow": "\u2192"
       },
       "air_quality": {
-        "us_aqi": 44,
-        "pm2_5": 6.1,
+        "us_aqi": 42,
+        "pm2_5": 6.4,
         "pm10": 8.2,
-        "co": 109.0,
-        "ozone": 63.0
+        "co": 112.0,
+        "ozone": 52.0
       },
       "alerts": [],
       "hourly": [
@@ -2131,7 +2131,7 @@
           "precip_sum": 0.0,
           "precip_prob_max": 1,
           "wind_max": 9.1,
-          "wind_gusts_max": 8.3,
+          "wind_gusts_max": 8.5,
           "wind_dir_dominant": 263
         },
         {
@@ -2150,7 +2150,7 @@
           "precip_sum": 0.0,
           "precip_prob_max": 1,
           "wind_max": 9.6,
-          "wind_gusts_max": 8.5,
+          "wind_gusts_max": 8.7,
           "wind_dir_dominant": 307
         },
         {
@@ -2169,7 +2169,7 @@
           "precip_sum": 0.0,
           "precip_prob_max": 1,
           "wind_max": 10.1,
-          "wind_gusts_max": 8.7,
+          "wind_gusts_max": 8.9,
           "wind_dir_dominant": 330
         },
         {
@@ -2188,7 +2188,7 @@
           "precip_sum": 0.0,
           "precip_prob_max": 6,
           "wind_max": 9.7,
-          "wind_gusts_max": 9.2,
+          "wind_gusts_max": 8.5,
           "wind_dir_dominant": 317
         }
       ]
@@ -2202,64 +2202,39 @@
         "elevation_ft": 4505
       },
       "current": {
-        "temp": 74.3,
-        "feels_like": 67.0,
+        "temp": 73.4,
+        "feels_like": 67.3,
         "humidity": 26,
-        "dew_point": 37.2,
+        "dew_point": 36.4,
         "weather_code": 0,
         "weather_desc": "Clear sky",
         "weather_icon": "\u2600\ufe0f",
         "is_day": 0,
         "cloud_cover": 0,
-        "pressure_msl": 1011.8,
+        "pressure_msl": 1012.0,
         "surface_pressure": 865.4,
-        "wind_speed": 10.3,
-        "wind_dir_deg": 294,
+        "wind_speed": 7.0,
+        "wind_dir_deg": 297,
         "wind_dir": "WNW",
-        "wind_gusts": 17.2,
-        "visibility": 225721.776,
+        "wind_gusts": 15.2,
+        "visibility": 222112.864,
         "precipitation": 0.0,
         "rain": 0.0,
         "snowfall": 0.0
       },
       "pressure_trend": {
-        "direction": "rising",
-        "change_3h": 0.6,
-        "arrow": "\u2197"
+        "direction": "steady",
+        "change_3h": 0.4,
+        "arrow": "\u2192"
       },
       "air_quality": {
-        "us_aqi": 32,
-        "pm2_5": 4.4,
-        "pm10": 4.7,
-        "co": 129.0,
-        "ozone": 40.0
+        "us_aqi": 30,
+        "pm2_5": 5.3,
+        "pm10": 5.6,
+        "co": 140.0,
+        "ozone": 31.0
       },
-      "alerts": [
-        {
-          "event": "Red Flag Warning",
-          "severity": "Severe",
-          "urgency": "Expected",
-          "headline": "Red Flag Warning issued August 22 at 1:05AM PDT until August 22 at 11:00PM PDT by NWS Reno NV",
-          "description": "* CHANGES...No changes.\n\n* Affected Area...Fire Weather Zone 270 Surprise Valley\nCalifornia, Fire Weather Zone 278 Eastern Lassen County, Fire\nWeather Zone 420 Northern Sierra Front including Carson City,\nDouglas, Storey, Southern Washoe, Western Lyon, and Far\nSouthern Lassen Counties, Fire Weather Zone 458 Northern\nWashoe County.\n\n* Winds...Southwest 15 to 25 mph with gusts up to 40 mph.\n\n* Humidity...As low as 12 percent.\n\n* Duration...3 to 6 hours between 11 AM and 11 PM PDT.\n\n* Impacts...The",
-          "instruction": "Avoid outdoor activities that can cause a spark near dry\nvegetation, such as yard work, target shooting, or campfires.\nFollow local fire restrictions. Check weather.gov/reno for\nupdates and livingwithfire.info for preparedness tips.",
-          "onset": "2026-08-22T11:00:00-07:00",
-          "expires": "2026-08-22T23:00:00-07:00",
-          "sender": "NWS Reno NV",
-          "color": "orange"
-        },
-        {
-          "event": "Lake Wind Advisory",
-          "severity": "Moderate",
-          "urgency": "Expected",
-          "headline": "Lake Wind Advisory issued August 21 at 11:22AM PDT until August 22 at 11:00PM PDT by NWS Reno NV",
-          "description": "* WHAT...Southwest winds 15 to 25 mph with gusts up to 35 mph for\nWashoe Lake.\n\n* WHERE...Greater Reno-Carson City-Minden Area.\n\n* WHEN...From 11 AM to 11 PM PDT Saturday.\n\n* IMPACTS...Gusty winds and increased wave heights on area lakes will\ncreate hazardous conditions for small boats, kayaks and paddle\nboards.",
-          "instruction": "Check lake conditions before heading out and be prepared for a sudden\nincrease in winds and wave heights. Consider postponing boating\nactivities on the lake until a day with less wind.",
-          "onset": "2026-08-22T11:00:00-07:00",
-          "expires": "2026-08-22T23:00:00-07:00",
-          "sender": "NWS Reno NV",
-          "color": "yellow"
-        }
-      ],
+      "alerts": [],
       "hourly": [
         {
           "time": "2026-08-22T00:00",
@@ -3045,7 +3020,7 @@
           "temp": 88.9,
           "feels_like": 79.2,
           "humidity": 16,
-          "precip_prob": 5,
+          "precip_prob": 4,
           "precip": 0.0,
           "weather_code": 3,
           "weather_desc": "Overcast",
@@ -3229,7 +3204,7 @@
           "precip_sum": 0.0,
           "precip_prob_max": 8,
           "wind_max": 19.0,
-          "wind_gusts_max": 22.0,
+          "wind_gusts_max": 20.6,
           "wind_dir_dominant": 241
         },
         {
@@ -3267,7 +3242,7 @@
           "precip_sum": 0.0,
           "precip_prob_max": 2,
           "wind_max": 19.7,
-          "wind_gusts_max": 22.6,
+          "wind_gusts_max": 22.8,
           "wind_dir_dominant": 236
         },
         {
@@ -3286,7 +3261,7 @@
           "precip_sum": 0.0,
           "precip_prob_max": 5,
           "wind_max": 19.1,
-          "wind_gusts_max": 24.8,
+          "wind_gusts_max": 22.6,
           "wind_dir_dominant": 238
         },
         {
@@ -3305,7 +3280,7 @@
           "precip_sum": 0.0,
           "precip_prob_max": 9,
           "wind_max": 20.0,
-          "wind_gusts_max": 21.0,
+          "wind_gusts_max": 23.3,
           "wind_dir_dominant": 242
         }
       ]
@@ -3319,21 +3294,21 @@
         "elevation_ft": -282
       },
       "current": {
-        "temp": 105.5,
-        "feels_like": 99.7,
+        "temp": 104.9,
+        "feels_like": 99.3,
         "humidity": 12,
-        "dew_point": 42.5,
+        "dew_point": 42.1,
         "weather_code": 0,
         "weather_desc": "Clear sky",
         "weather_icon": "\u2600\ufe0f",
         "is_day": 0,
         "cloud_cover": 0,
-        "pressure_msl": 1005.8,
-        "surface_pressure": 1012.3,
-        "wind_speed": 9.2,
-        "wind_dir_deg": 119,
+        "pressure_msl": 1005.9,
+        "surface_pressure": 1012.4,
+        "wind_speed": 8.4,
+        "wind_dir_deg": 115,
         "wind_dir": "ESE",
-        "wind_gusts": 10.3,
+        "wind_gusts": 9.2,
         "visibility": 295275.584,
         "precipitation": 0.0,
         "rain": 0.0,
@@ -3341,15 +3316,15 @@
       },
       "pressure_trend": {
         "direction": "rising",
-        "change_3h": 0.7,
+        "change_3h": 1.5,
         "arrow": "\u2197"
       },
       "air_quality": {
         "us_aqi": 48,
-        "pm2_5": 5.7,
-        "pm10": 16.6,
+        "pm2_5": 6.0,
+        "pm10": 17.8,
         "co": 95.0,
-        "ozone": 94.0
+        "ozone": 91.0
       },
       "alerts": [
         {
@@ -4093,7 +4068,7 @@
           "temp": 118.2,
           "feels_like": 109.8,
           "humidity": 7,
-          "precip_prob": 1,
+          "precip_prob": 0,
           "precip": 0.0,
           "weather_code": 0,
           "weather_desc": "Clear sky",
@@ -4334,7 +4309,7 @@
           "precip_sum": 0.0,
           "precip_prob_max": 1,
           "wind_max": 20.4,
-          "wind_gusts_max": 22.6,
+          "wind_gusts_max": 22.0,
           "wind_dir_dominant": 173
         },
         {
@@ -4353,7 +4328,7 @@
           "precip_sum": 0.0,
           "precip_prob_max": 0,
           "wind_max": 13.4,
-          "wind_gusts_max": 9.4,
+          "wind_gusts_max": 10.5,
           "wind_dir_dominant": 133
         },
         {
@@ -4372,7 +4347,7 @@
           "precip_sum": 0.0,
           "precip_prob_max": 0,
           "wind_max": 17.7,
-          "wind_gusts_max": 18.3,
+          "wind_gusts_max": 19.7,
           "wind_dir_dominant": 158
         },
         {
@@ -4391,7 +4366,7 @@
           "precip_sum": 0.0,
           "precip_prob_max": 1,
           "wind_max": 22.0,
-          "wind_gusts_max": 19.0,
+          "wind_gusts_max": 20.4,
           "wind_dir_dominant": 166
         },
         {
@@ -4410,7 +4385,7 @@
           "precip_sum": 0.0,
           "precip_prob_max": 1,
           "wind_max": 14.7,
-          "wind_gusts_max": 18.1,
+          "wind_gusts_max": 17.2,
           "wind_dir_dominant": 157
         }
       ]
