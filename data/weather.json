@@ -1,5 +1,5 @@
 {
-  "generated_utc": "2026-08-25T05:53:35.913730+00:00",
+  "generated_utc": "2026-08-25T06:24:25.439640+00:00",
   "moon": {
     "phase_name": "Waxing Gibbous",
     "emoji": "\ud83c\udf14",
@@ -18,22 +18,22 @@
         "elevation_ft": 300
       },
       "current": {
-        "temp": 66.4,
-        "feels_like": 66.3,
+        "temp": 65.3,
+        "feels_like": 65.5,
         "humidity": 68,
-        "dew_point": 55.5,
+        "dew_point": 54.5,
         "weather_code": 0,
         "weather_desc": "Clear sky",
         "weather_icon": "\u2600\ufe0f",
         "is_day": 0,
         "cloud_cover": 0,
-        "pressure_msl": 1013.7,
-        "surface_pressure": 1004.3,
-        "wind_speed": 4.4,
-        "wind_dir_deg": 49,
+        "pressure_msl": 1013.8,
+        "surface_pressure": 1004.4,
+        "wind_speed": 3.0,
+        "wind_dir_deg": 54,
         "wind_dir": "NE",
-        "wind_gusts": 13.4,
-        "visibility": 79724.408,
+        "wind_gusts": 12.5,
+        "visibility": 77755.904,
         "precipitation": 0.0,
         "rain": 0.0,
         "snowfall": 0.0
@@ -45,10 +45,10 @@
       },
       "air_quality": {
         "us_aqi": 62,
-        "pm2_5": 16.9,
-        "pm10": 17.0,
-        "co": 149.0,
-        "ozone": 53.0
+        "pm2_5": 19.2,
+        "pm10": 19.4,
+        "co": 148.0,
+        "ozone": 45.0
       },
       "alerts": [],
       "hourly": [
@@ -1039,7 +1039,7 @@
           "precip_sum": 0.0,
           "precip_prob_max": 7,
           "wind_max": 9.1,
-          "wind_gusts_max": 16.3,
+          "wind_gusts_max": 15.7,
           "wind_dir_dominant": 233
         },
         {
@@ -1058,7 +1058,7 @@
           "precip_sum": 0.0,
           "precip_prob_max": 2,
           "wind_max": 6.8,
-          "wind_gusts_max": 7.2,
+          "wind_gusts_max": 15.9,
           "wind_dir_dominant": 289
         },
         {
@@ -1077,7 +1077,7 @@
           "precip_sum": 0.0,
           "precip_prob_max": 18,
           "wind_max": 7.8,
-          "wind_gusts_max": 10.7,
+          "wind_gusts_max": 15.9,
           "wind_dir_dominant": 244
         },
         {
@@ -1096,7 +1096,7 @@
           "precip_sum": 0.0,
           "precip_prob_max": 4,
           "wind_max": 6.3,
-          "wind_gusts_max": 17.9,
+          "wind_gusts_max": 13.4,
           "wind_dir_dominant": 267
         }
       ]
@@ -1110,10 +1110,10 @@
         "elevation_ft": 2844
       },
       "current": {
-        "temp": 75.2,
-        "feels_like": 69.5,
+        "temp": 74.9,
+        "feels_like": 68.8,
         "humidity": 26,
-        "dew_point": 37.9,
+        "dew_point": 37.7,
         "weather_code": 0,
         "weather_desc": "Clear sky",
         "weather_icon": "\u2600\ufe0f",
@@ -1121,26 +1121,26 @@
         "cloud_cover": 0,
         "pressure_msl": 1013.5,
         "surface_pressure": 918.7,
-        "wind_speed": 6.7,
+        "wind_speed": 7.6,
         "wind_dir_deg": 140,
         "wind_dir": "SE",
-        "wind_gusts": 6.5,
-        "visibility": 228018.368,
+        "wind_gusts": 7.6,
+        "visibility": 225393.696,
         "precipitation": 0.0,
         "rain": 0.0,
         "snowfall": 0.0
       },
       "pressure_trend": {
         "direction": "steady",
-        "change_3h": -0.3,
+        "change_3h": 0.5,
         "arrow": "\u2192"
       },
       "air_quality": {
-        "us_aqi": 48,
-        "pm2_5": 9.6,
-        "pm10": 12.6,
-        "co": 141.0,
-        "ozone": 66.0
+        "us_aqi": 45,
+        "pm2_5": 9.5,
+        "pm10": 12.0,
+        "co": 138.0,
+        "ozone": 53.0
       },
       "alerts": [],
       "hourly": [
@@ -1871,7 +1871,7 @@
           "temp": 93.7,
           "feels_like": 90.9,
           "humidity": 16,
-          "precip_prob": 1,
+          "precip_prob": 0,
           "precip": 0.0,
           "weather_code": 0,
           "weather_desc": "Clear sky",
@@ -2131,7 +2131,7 @@
           "precip_sum": 0.0,
           "precip_prob_max": 0,
           "wind_max": 9.0,
-          "wind_gusts_max": 11.0,
+          "wind_gusts_max": 10.3,
           "wind_dir_dominant": 343
         },
         {
@@ -2150,7 +2150,7 @@
           "precip_sum": 0.004,
           "precip_prob_max": 30,
           "wind_max": 8.3,
-          "wind_gusts_max": 12.3,
+          "wind_gusts_max": 13.0,
           "wind_dir_dominant": 29
         },
         {
@@ -2169,7 +2169,7 @@
           "precip_sum": 0.0,
           "precip_prob_max": 8,
           "wind_max": 10.3,
-          "wind_gusts_max": 9.2,
+          "wind_gusts_max": 8.9,
           "wind_dir_dominant": 287
         },
         {
@@ -2188,7 +2188,7 @@
           "precip_sum": 0.0,
           "precip_prob_max": 0,
           "wind_max": 8.5,
-          "wind_gusts_max": 8.5,
+          "wind_gusts_max": 8.1,
           "wind_dir_dominant": 199
         }
       ]
@@ -2202,37 +2202,37 @@
         "elevation_ft": 4505
       },
       "current": {
-        "temp": 72.5,
-        "feels_like": 68.6,
+        "temp": 70.7,
+        "feels_like": 66.7,
         "humidity": 28,
-        "dew_point": 37.5,
+        "dew_point": 36.0,
         "weather_code": 0,
         "weather_desc": "Clear sky",
         "weather_icon": "\u2600\ufe0f",
         "is_day": 0,
         "cloud_cover": 0,
-        "pressure_msl": 1013.5,
-        "surface_pressure": 866.5,
-        "wind_speed": 2.2,
-        "wind_dir_deg": 233,
-        "wind_dir": "SW",
-        "wind_gusts": 7.6,
-        "visibility": 218832.016,
+        "pressure_msl": 1013.7,
+        "surface_pressure": 866.2,
+        "wind_speed": 1.9,
+        "wind_dir_deg": 159,
+        "wind_dir": "SSE",
+        "wind_gusts": 3.8,
+        "visibility": 211286.096,
         "precipitation": 0.0,
         "rain": 0.0,
         "snowfall": 0.0
       },
       "pressure_trend": {
         "direction": "steady",
-        "change_3h": -0.2,
+        "change_3h": 0.1,
         "arrow": "\u2192"
       },
       "air_quality": {
         "us_aqi": 354,
-        "pm2_5": 309.2,
-        "pm10": 312.0,
-        "co": 185.0,
-        "ozone": 5.0
+        "pm2_5": 372.5,
+        "pm10": 374.4,
+        "co": 202.0,
+        "ozone": 0.0
       },
       "alerts": [],
       "hourly": [
@@ -2887,7 +2887,7 @@
           "temp": 78.9,
           "feels_like": 76.2,
           "humidity": 25,
-          "precip_prob": 0,
+          "precip_prob": 1,
           "precip": 0.0,
           "weather_code": 3,
           "weather_desc": "Overcast",
@@ -3204,7 +3204,7 @@
           "precip_sum": 0.0,
           "precip_prob_max": 1,
           "wind_max": 20.0,
-          "wind_gusts_max": 22.2,
+          "wind_gusts_max": 22.3,
           "wind_dir_dominant": 258
         },
         {
@@ -3223,7 +3223,7 @@
           "precip_sum": 0.0,
           "precip_prob_max": 1,
           "wind_max": 22.0,
-          "wind_gusts_max": 20.4,
+          "wind_gusts_max": 25.5,
           "wind_dir_dominant": 247
         },
         {
@@ -3242,7 +3242,7 @@
           "precip_sum": 0.213,
           "precip_prob_max": 23,
           "wind_max": 7.3,
-          "wind_gusts_max": 17.7,
+          "wind_gusts_max": 14.5,
           "wind_dir_dominant": 207
         },
         {
@@ -3261,7 +3261,7 @@
           "precip_sum": 0.0,
           "precip_prob_max": 4,
           "wind_max": 18.8,
-          "wind_gusts_max": 23.5,
+          "wind_gusts_max": 17.9,
           "wind_dir_dominant": 242
         },
         {
@@ -3280,7 +3280,7 @@
           "precip_sum": 0.0,
           "precip_prob_max": 1,
           "wind_max": 18.8,
-          "wind_gusts_max": 16.3,
+          "wind_gusts_max": 21.0,
           "wind_dir_dominant": 246
         }
       ]
@@ -3294,10 +3294,10 @@
         "elevation_ft": -282
       },
       "current": {
-        "temp": 104.6,
-        "feels_like": 97.8,
+        "temp": 104.9,
+        "feels_like": 99.3,
         "humidity": 9,
-        "dew_point": 34.5,
+        "dew_point": 34.7,
         "weather_code": 0,
         "weather_desc": "Clear sky",
         "weather_icon": "\u2600\ufe0f",
@@ -3305,10 +3305,10 @@
         "cloud_cover": 0,
         "pressure_msl": 1007.4,
         "surface_pressure": 1013.9,
-        "wind_speed": 7.8,
-        "wind_dir_deg": 90,
+        "wind_speed": 5.2,
+        "wind_dir_deg": 83,
         "wind_dir": "E",
-        "wind_gusts": 7.8,
+        "wind_gusts": 5.1,
         "visibility": 295275.584,
         "precipitation": 0.0,
         "rain": 0.0,
@@ -3316,15 +3316,15 @@
       },
       "pressure_trend": {
         "direction": "rising",
-        "change_3h": 0.7,
+        "change_3h": 1.1,
         "arrow": "\u2197"
       },
       "air_quality": {
-        "us_aqi": 47,
-        "pm2_5": 5.5,
-        "pm10": 15.0,
+        "us_aqi": 46,
+        "pm2_5": 5.6,
+        "pm10": 15.3,
         "co": 91.0,
-        "ozone": 95.0
+        "ozone": 93.0
       },
       "alerts": [
         {
@@ -4049,7 +4049,7 @@
           "temp": 115.2,
           "feels_like": 116.6,
           "humidity": 9,
-          "precip_prob": 1,
+          "precip_prob": 0,
           "precip": 0.0,
           "weather_code": 3,
           "weather_desc": "Overcast",
@@ -4309,7 +4309,7 @@
           "precip_sum": 0.0,
           "precip_prob_max": 1,
           "wind_max": 14.4,
-          "wind_gusts_max": 15.9,
+          "wind_gusts_max": 22.6,
           "wind_dir_dominant": 157
         },
         {
@@ -4328,7 +4328,7 @@
           "precip_sum": 0.0,
           "precip_prob_max": 0,
           "wind_max": 9.2,
-          "wind_gusts_max": 20.1,
+          "wind_gusts_max": 12.3,
           "wind_dir_dominant": 176
         },
         {
@@ -4347,7 +4347,7 @@
           "precip_sum": 0.0,
           "precip_prob_max": 2,
           "wind_max": 28.1,
-          "wind_gusts_max": 29.5,
+          "wind_gusts_max": 27.3,
           "wind_dir_dominant": 174
         },
         {
@@ -4366,7 +4366,7 @@
           "precip_sum": 0.0,
           "precip_prob_max": 4,
           "wind_max": 20.1,
-          "wind_gusts_max": 25.1,
+          "wind_gusts_max": 21.0,
           "wind_dir_dominant": 154
         },
         {
@@ -4385,7 +4385,7 @@
           "precip_sum": 0.0,
           "precip_prob_max": 1,
           "wind_max": 22.9,
-          "wind_gusts_max": 23.5,
+          "wind_gusts_max": 31.8,
           "wind_dir_dominant": 165
         }
       ]
