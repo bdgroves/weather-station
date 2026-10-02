@@ -1,317 +1,253 @@
 #!/usr/bin/env python3
 """
 Weather Station — fetch_weather.py
-Fetches comprehensive weather data from Open-Meteo API for four locations.
-Fetches NWS active alerts for each location.
-Calculates moon phase and illumination.
-Writes static JSON consumed by the frontend dashboard.
-Python 3.12 stdlib only — no dependencies.
+───────────────────────────────────────────────────────────────────────────────
+The page reads live data straight from the sources in the browser (NWS
+observations, alerts and forecasts; Open-Meteo forecasts and air quality), so
+it is never older than a few minutes. This script does the slow and heavy
+work once an hour in GitHub Actions:
+
+  data/weather.json   a snapshot of everything, used only if a live source
+                      fails (and by anything else that wants one file)
+  data/climate.json   for each station's long-record climate site (ACIS):
+                      record high/low for every day of the year with the year
+                      it happened, 1991–2020 normals, and this month and this
+                      water year against normal. Rebuilt daily.
+
+Observed vs modelled: "current conditions" used to be Open-Meteo's model
+estimate for the grid square. They are now the latest real observation from
+the nearest NWS station, and the model is shown beside it as a forecast.
+
+Python 3.12 stdlib only.
 """
 
+import datetime as dt
 import json
-import urllib.request
-import datetime
 import math
 import os
+import time
+import urllib.request
 
-LOCATIONS = [
-    {"name": "Lakewood", "state": "WA", "lat": 47.1718, "lon": -122.5185, "tz": "America/Los_Angeles", "elevation_ft": 300},
-    {"name": "Groveland", "state": "CA", "lat": 37.8463, "lon": -120.2313, "tz": "America/Los_Angeles", "elevation_ft": 2844},
-    {"name": "Reno", "state": "NV", "lat": 39.5296, "lon": -119.8138, "tz": "America/Los_Angeles", "elevation_ft": 4505},
-    {"name": "Death Valley", "state": "CA", "lat": 36.4620, "lon": -116.8666, "tz": "America/Los_Angeles", "elevation_ft": -282},
+UA = "WeatherStation/2.0 (github.com/bdgroves/weather-station)"
+OUT = os.path.join(os.path.dirname(__file__), "data")
+
+# obs: NWS observation stations, best first. climate: ACIS station with the long record.
+STATIONS = [
+    {"key": "lakewood_wa", "name": "Lakewood", "state": "WA", "lat": 47.1718, "lon": -122.5185, "elevation_ft": 300,
+     "tz": "America/Los_Angeles", "nws": "SEW", "obs": ["KTCM", "KTIW", "KPLU"],
+     "climate": {"sid": "SEAthr 9", "label": "Seattle area (Sea-Tac and earlier city records)"}},
+    {"key": "groveland_ca", "name": "Groveland", "state": "CA", "lat": 37.8463, "lon": -120.2313, "elevation_ft": 2844,
+     "tz": "America/Los_Angeles", "nws": "STO", "obs": ["MOUC1", "GNSC1"],
+     "obs_note": "No official station near Groveland. The nearest is the Mount Elizabeth fire-weather station, 15 miles away and 2,100 ft higher.",
+     "climate": {"sid": "048353 2", "label": "Sonora (1,675 ft), the nearest century-long record"}},
+    {"key": "reno_nv", "name": "Reno", "state": "NV", "lat": 39.5296, "lon": -119.8138, "elevation_ft": 4505,
+     "tz": "America/Los_Angeles", "nws": "REV", "obs": ["KRNO"],
+     "climate": {"sid": "RNOthr 9", "label": "Reno (airport and earlier city records)"}},
+    {"key": "death_valley_ca", "name": "Death Valley", "state": "CA", "lat": 36.4620, "lon": -116.8666, "elevation_ft": -190,
+     "tz": "America/Los_Angeles", "nws": "VEF", "obs": ["DEVC1"],
+     "climate": {"sid": "042319 2", "label": "Death Valley (Furnace Creek / Greenland Ranch), since 1911"}},
 ]
 
-WMO_CODES = {
-    0: ("Clear sky", "☀️"), 1: ("Mainly clear", "🌤️"), 2: ("Partly cloudy", "⛅"),
-    3: ("Overcast", "☁️"), 45: ("Fog", "🌫️"), 48: ("Rime fog", "🌫️"),
-    51: ("Light drizzle", "🌦️"), 53: ("Moderate drizzle", "🌦️"), 55: ("Dense drizzle", "🌧️"),
-    56: ("Light freezing drizzle", "🌧️"), 57: ("Dense freezing drizzle", "🌧️"),
-    61: ("Slight rain", "🌦️"), 63: ("Moderate rain", "🌧️"), 65: ("Heavy rain", "🌧️"),
-    66: ("Light freezing rain", "🌧️"), 67: ("Heavy freezing rain", "🌧️"),
-    71: ("Slight snow", "🌨️"), 73: ("Moderate snow", "🌨️"), 75: ("Heavy snow", "❄️"),
-    77: ("Snow grains", "❄️"), 80: ("Slight showers", "🌦️"), 81: ("Moderate showers", "🌧️"),
-    82: ("Violent showers", "⛈️"), 85: ("Slight snow showers", "🌨️"), 86: ("Heavy snow showers", "❄️"),
-    95: ("Thunderstorm", "⛈️"), 96: ("Thunderstorm w/ slight hail", "⛈️"),
-    99: ("Thunderstorm w/ heavy hail", "⛈️"),
-}
+WMO = {0: "Clear", 1: "Mainly clear", 2: "Partly cloudy", 3: "Overcast", 45: "Fog", 48: "Rime fog",
+       51: "Light drizzle", 53: "Drizzle", 55: "Heavy drizzle", 56: "Freezing drizzle", 57: "Freezing drizzle",
+       61: "Light rain", 63: "Rain", 65: "Heavy rain", 66: "Freezing rain", 67: "Freezing rain",
+       71: "Light snow", 73: "Snow", 75: "Heavy snow", 77: "Snow grains", 80: "Showers", 81: "Showers",
+       82: "Violent showers", 85: "Snow showers", 86: "Heavy snow showers", 95: "Thunderstorm",
+       96: "Thunderstorm, hail", 99: "Thunderstorm, heavy hail"}
 
 
-def fetch_json(url):
-    req = urllib.request.Request(url, headers={
-        "User-Agent": "WeatherStation/1.0 (github.com/bdgroves/weather-station)",
-        "Accept": "application/geo+json",
-    })
-    with urllib.request.urlopen(req, timeout=30) as resp:
-        return json.loads(resp.read().decode())
+def get(url, data=None, accept="application/geo+json", retries=3):
+    body = json.dumps(data).encode() if data is not None else None
+    hdr = {"User-Agent": UA, "Accept": accept}
+    if body:
+        hdr["Content-Type"] = "application/json"
+    for i in range(retries):
+        try:
+            with urllib.request.urlopen(urllib.request.Request(url, data=body, headers=hdr), timeout=90) as r:
+                return json.loads(r.read().decode())
+        except Exception as e:
+            if i == retries - 1:
+                raise
+            print(f"    retry {url[:60]}… ({e})")
+            time.sleep(4 * (i + 1))
 
 
-def compass_direction(deg):
-    dirs = ["N","NNE","NE","ENE","E","ESE","SE","SSE",
-            "S","SSW","SW","WSW","W","WNW","NW","NNW"]
-    return dirs[round(deg / 22.5) % 16]
+# ── Observations (NWS) ───────────────────────────────────────────────────────
+def c2f(c):
+    return None if c is None else round(c * 9 / 5 + 32, 1)
 
 
-def moon_phase():
-    """Moon phase via Julian day calculation."""
-    now = datetime.datetime.now(datetime.timezone.utc)
-    y, m, d = now.year, now.month, now.day
-    if m <= 2:
-        y -= 1
-        m += 12
-    A = y // 100
-    B = 2 - A + A // 4
-    JD = int(365.25 * (y + 4716)) + int(30.6001 * (m + 1)) + d + B - 1524.5
-    synodic = 29.53058867
-    age = (JD - 2451550.1) % synodic
-    illumination = (1 - math.cos(2 * math.pi * age / synodic)) / 2 * 100
-
-    phases = [
-        (1.85, "New Moon", "🌑"), (5.53, "Waxing Crescent", "🌒"),
-        (9.22, "First Quarter", "🌓"), (12.91, "Waxing Gibbous", "🌔"),
-        (16.61, "Full Moon", "🌕"), (20.30, "Waning Gibbous", "🌖"),
-        (23.99, "Last Quarter", "🌗"), (27.68, "Waning Crescent", "🌘"),
-    ]
-    name, emoji = "New Moon", "🌑"
-    for threshold, n, e in phases:
-        if age < threshold:
-            name, emoji = n, e
-            break
-
-    full_age = synodic / 2
-    days_to_full = (full_age - age) if age < full_age else (synodic - age + full_age)
-
-    return {
-        "phase_name": name, "emoji": emoji,
-        "illumination": round(illumination, 1),
-        "age_days": round(age, 1),
-        "days_to_full": round(days_to_full, 1),
-        "days_to_new": round(synodic - age, 1),
-    }
+def latest_obs(st):
+    for sid in st["obs"]:
+        try:
+            p = get(f"https://api.weather.gov/stations/{sid}/observations/latest")["properties"]
+            v = lambda k: (p.get(k) or {}).get("value")
+            if v("temperature") is None and v("windSpeed") is None:
+                continue
+            return {"station": sid, "name": p.get("stationName"), "time": p.get("timestamp"),
+                    "text": p.get("textDescription") or None, "temp": c2f(v("temperature")),
+                    "dewpoint": c2f(v("dewpoint")), "humidity": round(v("relativeHumidity")) if v("relativeHumidity") is not None else None,
+                    "wind_mph": round(v("windSpeed") / 1.609, 1) if v("windSpeed") is not None else None,
+                    "gust_mph": round(v("windGust") / 1.609, 1) if v("windGust") is not None else None,
+                    "wind_dir": v("windDirection"),
+                    "pressure_hpa": round(v("barometricPressure") / 100, 1) if v("barometricPressure") else None,
+                    "visibility_mi": round(v("visibility") / 1609.34, 1) if v("visibility") is not None else None,
+                    "heat_index": c2f(v("heatIndex")), "wind_chill": c2f(v("windChill"))}
+        except Exception as e:
+            print(f"    obs {sid}: {e}")
+    return None
 
 
-def fetch_nws_alerts(lat, lon):
-    """Fetch active NWS alerts for a point."""
-    url = f"https://api.weather.gov/alerts/active?point={lat},{lon}&status=actual"
+# ── Forecast snapshot (Open-Meteo) — fallback for the page ───────────────────
+def forecast(st):
+    hourly = "temperature_2m,apparent_temperature,precipitation_probability,precipitation,weather_code,wind_speed_10m,wind_direction_10m,wind_gusts_10m,pressure_msl,relative_humidity_2m,uv_index"
+    daily = "weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,wind_speed_10m_max,wind_gusts_10m_max,sunrise,sunset,uv_index_max"
+    url = (f"https://api.open-meteo.com/v1/forecast?latitude={st['lat']}&longitude={st['lon']}"
+           f"&current=temperature_2m,weather_code,wind_speed_10m,pressure_msl&hourly={hourly}&daily={daily}"
+           f"&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone={st['tz']}"
+           f"&forecast_days=7&past_hours=24")
+    d = get(url, accept="application/json")
+    d["current"]["weather_text"] = WMO.get(d["current"].get("weather_code"), "")
+    return {"current": d["current"], "hourly": d["hourly"], "daily": d["daily"]}
+
+
+def alerts(st):
     try:
-        data = fetch_json(url)
-        alerts = []
-        for feat in data.get("features", []):
-            p = feat.get("properties", {})
-            sev = p.get("severity", "Unknown")
-            color = {"Extreme": "red", "Severe": "orange", "Moderate": "yellow"}.get(sev, "blue")
-            alerts.append({
-                "event": p.get("event", "Unknown"),
-                "severity": sev,
-                "urgency": p.get("urgency", ""),
-                "headline": p.get("headline", ""),
-                "description": (p.get("description") or "")[:500],
-                "instruction": (p.get("instruction") or "")[:300],
-                "onset": p.get("onset", ""),
-                "expires": p.get("expires", ""),
-                "sender": p.get("senderName", ""),
-                "color": color,
-            })
-        return alerts
+        feats = get(f"https://api.weather.gov/alerts/active?point={st['lat']},{st['lon']}&status=actual")["features"]
+        return [{"event": f["properties"]["event"], "severity": f["properties"]["severity"],
+                 "headline": f["properties"]["headline"], "expires": f["properties"]["expires"],
+                 "description": (f["properties"].get("description") or "")[:1500]} for f in feats]
     except Exception as e:
-        print(f"    NWS alerts error: {e}")
+        print(f"    alerts: {e}")
         return []
 
 
-def calc_pressure_trend(hourly):
-    """3-hour pressure trend from hourly data."""
-    p = hourly.get("pressure_msl", [])
-    times = hourly.get("time", [])
-    if not p or len(p) < 4:
-        return {"direction": "steady", "change_3h": 0, "arrow": "→"}
-
-    now_h = datetime.datetime.now().hour
-    idx = min(now_h, len(p) - 1)
-    idx3 = max(0, idx - 3)
-
-    if p[idx] is None or p[idx3] is None:
-        return {"direction": "steady", "change_3h": 0, "arrow": "→"}
-
-    change = round(p[idx] - p[idx3], 1)
-    if change > 1.5:
-        return {"direction": "rising_fast", "change_3h": change, "arrow": "⬆"}
-    elif change > 0.5:
-        return {"direction": "rising", "change_3h": change, "arrow": "↗"}
-    elif change < -1.5:
-        return {"direction": "falling_fast", "change_3h": change, "arrow": "⬇"}
-    elif change < -0.5:
-        return {"direction": "falling", "change_3h": change, "arrow": "↘"}
-    return {"direction": "steady", "change_3h": change, "arrow": "→"}
-
-
-def fetch_location(loc):
-    current_params = ",".join([
-        "temperature_2m","relative_humidity_2m","apparent_temperature",
-        "is_day","precipitation","rain","showers","snowfall",
-        "weather_code","cloud_cover","pressure_msl","surface_pressure",
-        "wind_speed_10m","wind_direction_10m","wind_gusts_10m",
-        "dew_point_2m","visibility",
-    ])
-    hourly_params = ",".join([
-        "temperature_2m","relative_humidity_2m","apparent_temperature",
-        "precipitation_probability","precipitation","weather_code",
-        "wind_speed_10m","wind_direction_10m","wind_gusts_10m",
-        "uv_index","visibility","cloud_cover","dew_point_2m","pressure_msl",
-    ])
-    daily_params = ",".join([
-        "weather_code","temperature_2m_max","temperature_2m_min",
-        "apparent_temperature_max","apparent_temperature_min",
-        "sunrise","sunset","daylight_duration",
-        "uv_index_max","precipitation_sum","precipitation_probability_max",
-        "wind_speed_10m_max","wind_gusts_10m_max","wind_direction_10m_dominant",
-    ])
-
-    url = (
-        f"https://api.open-meteo.com/v1/forecast?"
-        f"latitude={loc['lat']}&longitude={loc['lon']}"
-        f"&current={current_params}&hourly={hourly_params}&daily={daily_params}"
-        f"&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch"
-        f"&timezone={loc['tz']}&forecast_days=7"
-    )
-    data = fetch_json(url)
-
-    aqi_url = (
-        f"https://air-quality-api.open-meteo.com/v1/air-quality?"
-        f"latitude={loc['lat']}&longitude={loc['lon']}"
-        f"&current=us_aqi,pm2_5,pm10,carbon_monoxide,ozone&timezone={loc['tz']}"
-    )
+# ── Climate (ACIS) ───────────────────────────────────────────────────────────
+def acis_val(v):
+    """ACIS strings: '72', 'M' missing, 'T' trace, '0.42A' accumulated, 'S' subsequent."""
+    if v in ("M", "S", "", None):
+        return None
+    if v == "T":
+        return 0.0
     try:
-        aqi_current = fetch_json(aqi_url).get("current", {})
-    except Exception:
-        aqi_current = {}
+        return float(v.rstrip("ASTa"))
+    except ValueError:
+        return None
 
-    current = data.get("current", {})
-    hourly = data.get("hourly", {})
-    daily = data.get("daily", {})
-    wmo = current.get("weather_code", 0)
-    desc, icon = WMO_CODES.get(wmo, ("Unknown", "❓"))
-    wind_dir = current.get("wind_direction_10m", 0)
 
-    pressure_trend = calc_pressure_trend(hourly)
+def climate(st):
+    sid = st["climate"]["sid"]
+    today = dt.date.today()
+    d = get("https://data.rcc-acis.org/StnData",
+            {"sid": sid, "sdate": "por", "edate": today.isoformat(), "elems": "maxt,mint,pcpn,snow", "meta": "name,sids,ll,elev"},
+            accept="application/json")
+    rows = d.get("data", [])
+    meta = d.get("meta", {})
+    by_md = {}                                   # "MM-DD" → lists
+    days = []
+    for date, mx, mn, pc, sn in rows:
+        md = date[5:]
+        e = by_md.setdefault(md, {"hi": [], "lo": [], "pcpn": []})
+        mx, mn, pc = acis_val(mx), acis_val(mn), acis_val(pc)
+        y = int(date[:4])
+        if mx is not None:
+            e["hi"].append((mx, y))
+        if mn is not None:
+            e["lo"].append((mn, y))
+        if pc is not None and 1991 <= y <= 2020:
+            e["pcpn"].append(pc)
+        days.append((date, mx, mn, pc, acis_val(sn)))
 
-    print(f"  Fetching NWS alerts...")
-    alerts = fetch_nws_alerts(loc["lat"], loc["lon"])
-    if alerts:
-        print(f"  ⚠ {len(alerts)} alert(s): {', '.join(a['event'] for a in alerts)}")
-    else:
-        print(f"  ✓ No active alerts")
+    keys = [f"{m:02d}-{dd:02d}" for m in range(1, 13) for dd in range(1, 32)
+            if not (m in (4, 6, 9, 11) and dd == 31) and not (m == 2 and dd > 29)]
 
-    # Build hourly
-    hourly_out = []
-    times = hourly.get("time", [])
-    for i in range(min(48, len(times))):
-        h_wmo = (hourly.get("weather_code") or [])[i] if i < len(hourly.get("weather_code", [])) else 0
-        h_desc, h_icon = WMO_CODES.get(h_wmo, ("Unknown", "❓"))
-        hourly_out.append({
-            "time": times[i],
-            "temp": (hourly.get("temperature_2m") or [None]*48)[i],
-            "feels_like": (hourly.get("apparent_temperature") or [None]*48)[i],
-            "humidity": (hourly.get("relative_humidity_2m") or [None]*48)[i],
-            "precip_prob": (hourly.get("precipitation_probability") or [None]*48)[i],
-            "precip": (hourly.get("precipitation") or [None]*48)[i],
-            "weather_code": h_wmo, "weather_desc": h_desc, "weather_icon": h_icon,
-            "wind_speed": (hourly.get("wind_speed_10m") or [None]*48)[i],
-            "wind_dir": (hourly.get("wind_direction_10m") or [None]*48)[i],
-            "wind_gusts": (hourly.get("wind_gusts_10m") or [None]*48)[i],
-            "uv_index": (hourly.get("uv_index") or [None]*48)[i],
-            "visibility": (hourly.get("visibility") or [None]*48)[i],
-            "cloud_cover": (hourly.get("cloud_cover") or [None]*48)[i],
-            "dew_point": (hourly.get("dew_point_2m") or [None]*48)[i],
-            "pressure": (hourly.get("pressure_msl") or [None]*48)[i],
-        })
+    def window(i, field, years=None):
+        vals = []
+        for k in range(i - 7, i + 8):
+            for v, y in by_md.get(keys[k % len(keys)], {}).get(field, []):
+                if years is None or years[0] <= y <= years[1]:
+                    vals.append(v)
+        return vals
 
-    # Build daily
-    daily_out = []
-    d_times = daily.get("time", [])
-    for i in range(min(7, len(d_times))):
-        d_wmo = (daily.get("weather_code") or [0]*7)[i]
-        d_desc, d_icon = WMO_CODES.get(d_wmo, ("Unknown", "❓"))
-        daily_out.append({
-            "date": d_times[i],
-            "weather_code": d_wmo, "weather_desc": d_desc, "weather_icon": d_icon,
-            "temp_max": (daily.get("temperature_2m_max") or [None]*7)[i],
-            "temp_min": (daily.get("temperature_2m_min") or [None]*7)[i],
-            "feels_max": (daily.get("apparent_temperature_max") or [None]*7)[i],
-            "feels_min": (daily.get("apparent_temperature_min") or [None]*7)[i],
-            "sunrise": (daily.get("sunrise") or [None]*7)[i],
-            "sunset": (daily.get("sunset") or [None]*7)[i],
-            "daylight_hrs": round(daily["daylight_duration"][i] / 3600, 1) if daily.get("daylight_duration") and daily["daylight_duration"][i] else None,
-            "uv_max": (daily.get("uv_index_max") or [None]*7)[i],
-            "precip_sum": (daily.get("precipitation_sum") or [None]*7)[i],
-            "precip_prob_max": (daily.get("precipitation_probability_max") or [None]*7)[i],
-            "wind_max": (daily.get("wind_speed_10m_max") or [None]*7)[i],
-            "wind_gusts_max": (daily.get("wind_gusts_10m_max") or [None]*7)[i],
-            "wind_dir_dominant": (daily.get("wind_direction_10m_dominant") or [None]*7)[i],
-        })
+    days_out = {}
+    for i, k in enumerate(keys):
+        e = by_md.get(k)
+        if not e or not e["hi"]:
+            continue
+        nh, nl = window(i, "hi", (1991, 2020)), window(i, "lo", (1991, 2020))
+        rh = max(e["hi"], key=lambda t: (t[0], t[1]))
+        rl = min(e["lo"], key=lambda t: (t[0], -t[1])) if e["lo"] else (None, None)
+        # mean daily precip, smoothed over ±7 days
+        pv = [v for kk in range(i - 7, i + 8) for v in by_md.get(keys[kk % len(keys)], {}).get("pcpn", [])]
+        days_out[k] = {"normal_hi": round(sum(nh) / len(nh), 1) if nh else None,
+                       "normal_lo": round(sum(nl) / len(nl), 1) if nl else None,
+                       "record_hi": rh[0], "record_hi_year": rh[1],
+                       "record_lo": rl[0], "record_lo_year": rl[1],
+                       "normal_pcpn": round(sum(pv) / len(pv), 3) if pv else None}
 
-    return {
-        "location": {
-            "name": loc["name"], "state": loc["state"],
-            "lat": loc["lat"], "lon": loc["lon"],
-            "elevation_ft": loc["elevation_ft"],
-        },
-        "current": {
-            "temp": current.get("temperature_2m"),
-            "feels_like": current.get("apparent_temperature"),
-            "humidity": current.get("relative_humidity_2m"),
-            "dew_point": current.get("dew_point_2m"),
-            "weather_code": wmo, "weather_desc": desc, "weather_icon": icon,
-            "is_day": current.get("is_day"),
-            "cloud_cover": current.get("cloud_cover"),
-            "pressure_msl": current.get("pressure_msl"),
-            "surface_pressure": current.get("surface_pressure"),
-            "wind_speed": current.get("wind_speed_10m"),
-            "wind_dir_deg": wind_dir,
-            "wind_dir": compass_direction(wind_dir) if wind_dir is not None else None,
-            "wind_gusts": current.get("wind_gusts_10m"),
-            "visibility": current.get("visibility"),
-            "precipitation": current.get("precipitation"),
-            "rain": current.get("rain"),
-            "snowfall": current.get("snowfall"),
-        },
-        "pressure_trend": pressure_trend,
-        "air_quality": {
-            "us_aqi": aqi_current.get("us_aqi"),
-            "pm2_5": aqi_current.get("pm2_5"),
-            "pm10": aqi_current.get("pm10"),
-            "co": aqi_current.get("carbon_monoxide"),
-            "ozone": aqi_current.get("ozone"),
-        },
-        "alerts": alerts,
-        "hourly": hourly_out,
-        "daily": daily_out,
-    }
+    # recent daily values: last 400 days, for month-to-date and water-year-to-date
+    recent = [{"date": a, "hi": b, "lo": c, "pcpn": p, "snow": s} for a, b, c, p, s in days[-400:]]
+    first_year = int(rows[0][0][:4]) if rows else None
+    return {"sid": sid, "label": st["climate"]["label"], "name": meta.get("name"), "elev_ft": meta.get("elev"),
+            "first_year": first_year, "last_date": rows[-1][0] if rows else None,
+            "days": days_out, "recent": recent}
+
+
+def moon():
+    """Moon phase from the current instant (synodic month from a known new moon)."""
+    now = dt.datetime.now(dt.timezone.utc)
+    jd = now.timestamp() / 86400 + 2440587.5
+    syn = 29.530588853
+    age = (jd - 2451550.09766) % syn
+    illum = (1 - math.cos(2 * math.pi * age / syn)) / 2
+    names = ["New Moon", "Waxing Crescent", "First Quarter", "Waxing Gibbous", "Full Moon",
+             "Waning Gibbous", "Last Quarter", "Waning Crescent"]
+    return {"age_days": round(age, 2), "illumination": round(illum * 100, 1),
+            "phase": names[int((age / syn) * 8 + 0.5) % 8],
+            "days_to_full": round((syn / 2 - age) % syn, 1), "days_to_new": round(syn - age, 1)}
 
 
 def main():
-    out_dir = os.path.join(os.path.dirname(__file__), "data")
-    os.makedirs(out_dir, exist_ok=True)
-
-    all_data = {}
-    now = datetime.datetime.now(datetime.timezone.utc).isoformat()
-    moon = moon_phase()
-    print(f"Moon: {moon['emoji']} {moon['phase_name']} — {moon['illumination']}% illuminated")
-
-    for loc in LOCATIONS:
-        key = f"{loc['name'].lower().replace(' ', '_')}_{loc['state'].lower()}"
-        print(f"Fetching {loc['name']}, {loc['state']}...")
+    os.makedirs(OUT, exist_ok=True)
+    now = dt.datetime.now(dt.timezone.utc)
+    snap = {"generated_utc": now.isoformat(timespec="seconds"), "moon": moon(),
+            "stations": {s["key"]: {k: s[k] for k in ("key", "name", "state", "lat", "lon", "elevation_ft", "tz", "nws", "obs")} | {"obs_note": s.get("obs_note")} for s in STATIONS}}
+    ok = 0
+    for st in STATIONS:
+        print(f"{st['name']}, {st['state']}")
+        rec = snap["stations"][st["key"]]
         try:
-            result = fetch_location(loc)
-            all_data[key] = result
-            print(f"  ✓ {result['current']['temp']}°F, {result['current']['weather_desc']}")
+            rec["forecast"] = forecast(st)
+            ok += 1
         except Exception as e:
-            print(f"  ✗ Error: {e}")
-            all_data[key] = {"error": str(e), "location": {"name": loc["name"], "state": loc["state"]}}
+            print(f"  forecast failed: {e}")
+        rec["observed"] = latest_obs(st)
+        rec["alerts"] = alerts(st)
+        o = rec["observed"]
+        print(f"  observed: {o and o['temp']}°F at {o and o['station']} ({o and o['time']}) · {len(rec['alerts'])} alerts")
+    if not ok:
+        print("::error::No forecasts fetched — keeping the published snapshot")
+        raise SystemExit(1)
+    with open(os.path.join(OUT, "weather.json"), "w") as f:
+        json.dump(snap, f, separators=(",", ":"))
 
-    output = {"generated_utc": now, "moon": moon, "stations": all_data}
-    outpath = os.path.join(out_dir, "weather.json")
-    with open(outpath, "w") as f:
-        json.dump(output, f, indent=2)
-    print(f"\nWrote {outpath} ({os.path.getsize(outpath):,} bytes)")
+    # climate: once a day (ACIS updates overnight)
+    cpath = os.path.join(OUT, "climate.json")
+    old = json.load(open(cpath)) if os.path.exists(cpath) else {}
+    if old.get("built") != now.date().isoformat():
+        clim = {"built": now.date().isoformat(), "stations": {}}
+        for st in STATIONS:
+            try:
+                c = climate(st)
+                clim["stations"][st["key"]] = c
+                print(f"  climate {st['name']}: {c['name']} since {c['first_year']}, through {c['last_date']}")
+            except Exception as e:
+                print(f"  climate {st['name']} failed: {e}")
+                if st["key"] in old.get("stations", {}):
+                    clim["stations"][st["key"]] = old["stations"][st["key"]]
+        if clim["stations"]:
+            with open(cpath, "w") as f:
+                json.dump(clim, f, separators=(",", ":"))
 
 
 if __name__ == "__main__":

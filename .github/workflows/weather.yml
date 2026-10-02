@@ -2,11 +2,20 @@ name: Weather Station Update
 
 on:
   schedule:
-    - cron: '*/30 * * * *'
+    # Hourly at :23 (on-the-hour and half-hour schedules are the ones GitHub drops
+    # under load — the old */30 schedule really ran every 3–7 hours).
+    # The page reads live data itself; this keeps the fallback snapshot and the
+    # climate records fresh. Commits every 3 hours, or when the daily climate
+    # rebuild lands.
+    - cron: '23 * * * *'
   workflow_dispatch:
 
 permissions:
   contents: write
+
+concurrency:
+  group: weather-update
+  cancel-in-progress: false
 
 jobs:
   update:
@@ -17,14 +26,22 @@ jobs:
       - name: Set up pixi
         uses: prefix-dev/setup-pixi@v0.8.1
 
-      - name: Fetch weather data
-        run: pixi run fetch
+      - name: Fetch weather and climate data
+        run: |
+          pixi run fetch > fetch.log 2>&1 || { cat fetch.log; echo "::error title=fetch_weather::$(tail -20 fetch.log | sed ':a;N;$!ba;s/%/%25/g;s/\n/%0A/g')"; exit 1; }
+          cat fetch.log
 
       - name: Commit and push
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/weather.json
+          git add data/
           git diff --quiet --cached && echo "No changes" && exit 0
+          HOUR=$(date -u +%H)
+          CLIMATE=$(git diff --cached --name-only | grep climate.json || true)
+          if [ -z "$CLIMATE" ] && [ $((10#$HOUR % 3)) -ne 0 ] && [ "${{ github.event_name }}" != "workflow_dispatch" ]; then
+            echo "Snapshot only — the page reads live data; committing every 3 hours"; exit 0
+          fi
           git commit -m "🌡️ Weather update $(date -u '+%Y-%m-%d %H:%M UTC')"
-          git push
+          git pull --rebase origin "${GITHUB_REF_NAME}"
+          git push origin HEAD:"${GITHUB_REF_NAME}"
