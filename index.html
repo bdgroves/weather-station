@@ -391,7 +391,22 @@ async function getAFD(st){
 }
 async function getAlerts(st){
   try{ return (await nws(`/alerts/active?point=${st.lat},${st.lon}`)).features.map(f=>f.properties); }
-  catch(e){ return (S.snap?.stations?.[st.key]?.alerts||[]).map(a=>({event:a.event,severity:a.severity,headline:a.headline,description:a.description,expires:a.expires})); }
+  catch(e){}
+  const snap=(S.snap?.stations?.[st.key]?.alerts||[]).map(a=>({event:a.event,severity:a.severity,headline:a.headline,description:a.description,expires:a.expires}));
+  try{ const a=await iemAlerts(st);
+    // the backup copy has the full text for the home stations; the Mesonet has what's current
+    return a.map(x=>{ const s=snap.find(y=>y.event===x.event); return s?{...x,description:s.description||x.description}:x; }); }
+  catch(e){ return snap; }
+}
+async function iemAlerts(st){
+  const day=k=>new Date(Date.now()+k*86400e3).toISOString().slice(0,10);
+  const j=JSON.parse(await T(`${IEM}/json/vtec_events_bypoint.py?lat=${st.lat.toFixed(4)}&lon=${st.lon.toFixed(4)}&sdate=${day(-21)}&edate=${day(10)}`));
+  const now=Date.now(), seen=new Set(), sev={W:'Severe',Y:'Moderate',A:'Moderate',S:'Minor'};
+  const fmt=t=>new Date(t).toLocaleString('en-US',{weekday:'short',month:'short',day:'numeric',hour:'numeric',minute:'2-digit',timeZoneName:'short'});
+  return (j.events||[]).filter(e=>Date.parse(e.expire)>now).filter(e=>{ const k=[e.wfo,e.phenomena,e.significance,e.eventid].join('.'); if(seen.has(k)) return false; seen.add(k); return true; })
+    .map(e=>({event:e.name||`${e.ph_name} ${e.sig_name}`, severity:sev[e.significance]||'Unknown', expires:e.expire,
+      headline:`${e.name} from NWS ${e.wfo}, ${Date.parse(e.issue)>now?'starting '+fmt(e.issue)+', ':''}until ${fmt(e.expire)}`,
+      description:'Read from the Iowa Environmental Mesonet because the National Weather Service couldn’t be reached.', link:IEM+e.url}));
 }
 
 async function loadStation(st, quick){
@@ -413,10 +428,25 @@ const ACIS='https://data.rcc-acis.org';
 function acisVal(v){ if(v==null||v==='M'||v==='S'||v==='') return null; if(v==='T') return 0; const x=parseFloat(String(v).replace(/[ASTa]$/,'')); return Number.isNaN(x)?null:x; }
 async function getClimate(st){
   const d=0.45, today=new Date().toISOString().slice(0,10), soon=new Date(Date.now()-120*86400e3).toISOString().slice(0,10);   // co-op reports can lag weeks
-  const m=await J(`${ACIS}/StnMeta?bbox=${(st.lon-d).toFixed(2)},${(st.lat-d).toFixed(2)},${(st.lon+d).toFixed(2)},${(st.lat+d).toFixed(2)}&elems=maxt,mint,pcpn&meta=name,uid,ll,elev,valid_daterange`,null,2);
+  const m=await J(`${ACIS}/StnMeta?bbox=${(st.lon-d).toFixed(2)},${(st.lat-d).toFixed(2)},${(st.lon+d).toFixed(2)},${(st.lat+d).toFixed(2)}&elems=maxt,mint,pcpn&meta=name,uid,ll,elev,valid_daterange,sids`,null,2);
   const all=(m.meta||[]).filter(x=>x.ll&&(x.valid_daterange||[])[0]?.length).map(x=>{ const r=x.valid_daterange;
     return {...x, start:r[0][0], end:r[0][1], pend:r[2]?.[1]||'', mi:Math.hypot((x.ll[0]-st.lon)*Math.cos(st.lat*Math.PI/180),x.ll[1]-st.lat)*69}; });
-  // current stations that report both temperature and rain, within 30 miles
+  // NOAA's own threaded records (ThreadEx) exist for about 270 places and are named after the airport: try those first
+  try{
+    const faa=all.filter(x=>x.mi<=25).map(x=>({x, code:(x.sids||[]).map(s=>s.split(' ')).find(([c,t])=>t==='3'&&/^[A-Z0-9]{3}$/.test(c))?.[0]})).filter(o=>o.code);
+    if(faa.length){
+      const tm=await J(`${ACIS}/StnMeta?sids=${encodeURIComponent([...new Set(faa.map(o=>o.code+'thr 9'))].join(','))}&elems=maxt&meta=name,sids,valid_daterange`,null,2);
+      const thr=(tm.meta||[]).map(t=>{ const code=(t.sids||[])[0]?.replace(/thr 9$/,''); const at=faa.filter(o=>o.code===code).sort((a,b)=>a.x.mi-b.x.mi)[0]?.x;
+          return at&&(t.valid_daterange?.[0]||[])[1]>=soon ? {...t, sid:t.sids[0], ll:at.ll, elev:at.elev, mi:at.mi, start:t.valid_daterange[0][0]} : null; })
+        .filter(Boolean).sort((a,b)=>a.mi-b.mi);
+      for(const t of thr.slice(0,1)){
+        const r=await J(`${ACIS}/StnData?sid=${encodeURIComponent(t.sid)}&sdate=por&edate=${today}&elems=maxt,mint,pcpn&meta=name`,null,2);
+        const cl=buildClim({...t, name:(t.name||'').replace(/ Area$/,'')+' area'}, r.data||[], today, []);
+        if(cl && Object.values(cl.days).filter(x=>x.normal_hi!=null).length/366>=0.8){ cl.label+=' — NOAA’s threaded record'; return cl; }
+      }
+    }
+  }catch(e){ console.warn('threads',e.message); }
+  // otherwise: current stations that report both temperature and rain, within 30 miles
   const cands=all.filter(x=>x.end>=soon && x.pend>=soon && x.mi<=30)
     .sort((a,b)=>{ const t=x=>x.start<='1991-01-01'?0:1, n=x=>x.mi<=10?0:1;   // covers the normals, then within 10 miles, then the longest, then the nearest
       return t(a)-t(b) || n(a)-n(b) || a.start.localeCompare(b.start) || a.mi-b.mi; });
@@ -484,7 +514,7 @@ function renderTabs(){
   if(on && t.scrollWidth>t.clientWidth) t.scrollLeft=Math.max(0,on.offsetLeft-(t.clientWidth-on.offsetWidth)/2);
 }
 function renderAlerts(al){
-  $('alerts').innerHTML=(al||[]).map(a=>`<details class="alert a-${esc(a.severity||'Unknown')}"><summary><span>⚠</span><div><div class="ev">${esc(a.event)}</div><div class="hd">${esc(a.headline||'')}</div></div></summary><pre>${esc(a.description||'')}${a.instruction?'\n\n'+esc(a.instruction):''}</pre></details>`).join('');
+  $('alerts').innerHTML=(al||[]).map(a=>`<details class="alert a-${esc(a.severity||'Unknown')}"><summary><span>⚠</span><div><div class="ev">${esc(a.event)}</div><div class="hd">${esc(a.headline||'')}</div></div></summary><pre>${esc(a.description||'')}${a.link?`\n\n<a href="${esc(a.link)}" target="_blank" rel="noopener">Read the full bulletin →</a>`:''}${a.instruction?'\n\n'+esc(a.instruction):''}</pre></details>`).join('');
 }
 function icon(text, isDay){
   const t=(text||'').toLowerCase();
