@@ -101,6 +101,11 @@ canvas{max-width:100%}
 .chart{position:relative;height:260px} .chart.sm{height:150px}
 .legend{display:flex;gap:14px;flex-wrap:wrap;font:.7rem var(--fm);color:var(--t2);margin-top:8px}
 .legend i{display:inline-block;width:16px;height:3px;border-radius:2px;vertical-align:middle;margin-right:5px}
+.seg{display:inline-flex;gap:2px;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:2px}
+.seg button{background:none;border:0;color:var(--t3);font:500 .65rem var(--fm);letter-spacing:.1em;text-transform:uppercase;padding:3px 8px;border-radius:4px;cursor:pointer}
+.seg button.on{background:var(--hover);color:var(--amber)}
+.v-say{font:1rem/1.55 var(--fb);color:var(--t1);margin:0 0 14px;max-width:880px}
+.v-say b{color:var(--amber);font-weight:600}
 .legend i.dash{background:repeating-linear-gradient(90deg,var(--amber) 0 4px,transparent 4px 7px)}
 
 .days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px}
@@ -202,6 +207,20 @@ footer b{color:var(--t2);font-weight:500}
     <div class="sec-h"><h2>Next seven days</h2><p>Model forecast (Open-Meteo), with the 1991–2020 normal for each date underneath, and the National Weather Service's own wording.</p></div>
     <div class="days" id="days"></div>
     <div class="nws-list" id="nws"></div>
+  </section>
+
+  <section class="sec" id="v-sec">
+    <div class="sec-h"><h2>How good is the forecast?</h2><p id="v-intro">Every day the forecast is scored against what the station measured, and against two simple guesses it should beat: the normal for the date, and “same as before”.</p></div>
+    <div class="v-say" id="v-say"></div>
+    <div class="g2">
+      <div class="card"><h3>Average miss, by days ahead <span class="seg" id="v-kind"><button data-k="hi" class="on">Highs</button><button data-k="lo">Lows</button></span></h3>
+        <div class="chart"><canvas id="vChart"></canvas></div>
+        <div class="legend"><span><i style="background:var(--amber)"></i>the model (Open-Meteo)</span><span id="v-nws-leg"><i style="background:#a78bfa"></i>National Weather Service</span><span><i style="background:repeating-linear-gradient(90deg,#9aa6bf 0 4px,transparent 4px 7px)"></i>guess the normal</span><span><i style="background:repeating-linear-gradient(90deg,#34d399 0 4px,transparent 4px 7px)"></i>same as N days before</span></div></div>
+      <div class="card"><h3>The last 30 days <em>highs</em></h3>
+        <div class="chart"><canvas id="vSeries"></canvas></div>
+        <div class="legend"><span><i style="background:#ef6868"></i>measured</span><span><i style="background:var(--amber)"></i>forecast the day before</span><span><i style="background:repeating-linear-gradient(90deg,var(--amber) 0 4px,transparent 4px 7px)"></i>forecast 5 days before</span><span><i style="background:rgba(154,166,191,.35);height:8px"></i>normal</span></div></div>
+    </div>
+    <div class="note" id="v-note" style="margin-top:10px"></div>
   </section>
 
   <section class="sec">
@@ -335,8 +354,8 @@ const hhmm = ms => { const d=new Date(ms+TZOFF*1000); let h=d.getUTCHours(), m=d
 
 // ═══ loading ═══════════════════════════════════════════════════════════════
 async function loadStatic(){
-  const [snap, clim] = await Promise.all([J('data/weather.json').catch(()=>null), J('data/climate.json').catch(()=>null)]);
-  S.snap=snap; S.clim=clim;
+  const [snap, clim, ver] = await Promise.all([J('data/weather.json').catch(()=>null), J('data/climate.json').catch(()=>null), J('data/verify.json').catch(()=>null)]);
+  S.snap=snap; S.clim=clim; S.ver=ver;
 }
 async function getObs(st){
   // latest from the first station that reports a temperature, plus its last 30 hours
@@ -502,7 +521,7 @@ function render(st){
   const c=S.cache[st.key]; if(!c) return;
   if(c.fc?.utc_offset_seconds!=null) TZOFF=c.fc.utc_offset_seconds;
   renderTabs(); renderAlerts(c.alerts); renderNow(st,c); renderInstruments(st,c); renderCharts(st,c); renderDays(st,c); renderNWS(c.periods); renderAFD(st,c.afd);
-  renderClimate(st); renderAQ(c.aq); renderSun(c.fc); renderMoon(); renderFresh(st,c);
+  renderClimate(st); renderVerify(st); renderAQ(c.aq); renderSun(c.fc); renderMoon(); renderFresh(st,c);
   document.title=`${r0(c.obs?.latest?.temp)}° ${st.name} — Weather Station`;
 }
 
@@ -662,9 +681,46 @@ function renderDays(st,c){
     return `<div class="day${t===today?' today':''}" title="${esc(w[0])}"><div class="dn">${dn}</div><div class="dd">${new Date(t+'T12:00:00Z').toLocaleDateString('en-US',{month:'short',day:'numeric',timeZone:'UTC'})}</div>
       <div class="di">${w[1]}</div><div class="hl" style="color:${dep==null?'':dep>=8?'var(--orange)':dep<=-8?'var(--blue)':''}">${r0(hi)}° <span>${r0(d.temperature_2m_min[i])}°</span></div>
       ${cd?`<div class="nm">normal ${r0(cd.normal_hi)}/${r0(cd.normal_lo)}${cd.record_hi!=null&&hi>=cd.record_hi?` · <span style="color:var(--red)">≥ record</span>`:''}</div>`:''}
+      ${(()=>{ const v=S.ver?.stations?.[st.key]?.all?.[String(i)]?.model?.hi; return i>0&&v?`<div class="nm" title="Over the last ${v.n} days, the model's high ${i} day${i>1?'s':''} ahead was within ±${r0(v.p80)}° four times out of five">usually ±${r0(v.p80)}°</div>`:''; })()}
       <div class="pp">💧 ${r0(d.precipitation_probability_max[i])}%${d.precipitation_sum[i]>=0.01?` · ${d.precipitation_sum[i].toFixed(2)}"`:''}</div>
       <div class="wd">💨 ${r0(d.wind_speed_10m_max[i])}${d.wind_gusts_10m_max[i]>=d.wind_speed_10m_max[i]+5?`–${r0(d.wind_gusts_10m_max[i])}`:''} mph</div></div>`; }).join('');
 }
+// ── forecast scoring (data/verify.json, built daily by verify.py) ─────────────
+S.vKind='hi';
+function renderVerify(st){
+  const v=S.ver?.stations?.[st.key], sec=$('v-sec');
+  if(!v){ sec.style.display=st.custom?'none':''; if(!st.custom){ $('v-say').textContent='The forecast scores are being built; check back after the next daily update.'; } return; }
+  sec.style.display='';
+  const k=S.vKind, A=v.all, L=n=>A[String(n)], f=x=>x==null?'—':(+x).toFixed(1)+'°';
+  const m1=L(1).model[k], m3=L(3).model[k], m7=L(7).model[k], nm=L(1).normal[k];
+  // how many days ahead the model still beats guessing the normal
+  let beat=0; for(let n=1;n<=7;n++){ const a=L(n).model[k], b=L(n).normal[k]; if(a&&b&&a.mae<b.mae) beat=n; else break; }
+  const what=k==='hi'?'high':'low', nws1=L(1).nws[k];
+  $('v-say').innerHTML=`Over the last <b>${v.days} days</b>, the model's ${what} for tomorrow was off by <b>${f(m1?.mae)}</b> on average, and within ±${f(m1?.p80)} four days out of five. Three days out it was off by ${f(m3?.mae)}, a week out ${f(m7?.mae)}. Just guessing the normal would have been off by ${f(nm?.mae)}${beat>=7?', so the forecast beats it all the way to day 7':beat?`, so the forecast beats it out to day ${beat}`:', so here the forecast doesn’t beat it'}.${m1&&Math.abs(m1.bias)>=1.5?` It tends to run <b>${Math.abs(m1.bias).toFixed(1)}° ${m1.bias>0?'warm':'cool'}</b> here.`:''}${nws1&&nws1.n>=10?` The National Weather Service's own ${what} for tomorrow: off by ${f(nws1.mae)} over ${nws1.n} days.`:''}`;
+  const pts=(src,key)=>[1,2,3,4,5,6,7].map(n=>({x:n,y:L(n)[src][k]?.[key]??null}));
+  const nwsOK=L(1).nws[k]?.n>=5; $('v-nws-leg').style.display=nwsOK?'':'none';
+  mk('vChart',{type:'line',data:{datasets:[
+    {label:'model',data:pts('model','mae'),borderColor:'#f5a623',backgroundColor:'#f5a623',borderWidth:2.5,pointRadius:3,tension:.25},
+    ...(nwsOK?[{label:'NWS',data:pts('nws','mae'),borderColor:'#a78bfa',backgroundColor:'#a78bfa',borderWidth:2,pointRadius:3,tension:.25}]:[]),
+    {label:'normal',data:pts('normal','mae'),borderColor:'#9aa6bf',borderDash:[5,4],borderWidth:1.5,pointRadius:0},
+    {label:'same as N days before',data:pts('persistence','mae'),borderColor:'#34d399',borderDash:[5,4],borderWidth:1.5,pointRadius:0,tension:.25}]},
+    options:{responsive:true,maintainAspectRatio:false,animation:false,interaction:{mode:'index',intersect:false},
+      plugins:{legend:{display:false},tooltip:{callbacks:{title:i=>`${i[0].parsed.x} day${i[0].parsed.x>1?'s':''} ahead`,label:i=>`${i.dataset.label}: off by ${i.parsed.y.toFixed(1)}° on average`}}},
+      scales:{x:{type:'linear',min:1,max:7,ticks:{stepSize:1,color:'#7d8aa5',callback:x=>x===1?'tomorrow':x+' days'},grid:{color:'rgba(255,255,255,.04)'}},
+              y:{beginAtZero:true,ticks:{color:'#7d8aa5',callback:y=>y+'°'},grid:{color:'rgba(255,255,255,.05)'},title:{display:true,text:'average miss',color:'#7d8aa5',font:{size:10}}}}}});
+  const ser=(v.series||[]).slice(-30), lab=ser.map(r=>new Date(r.date+'T12:00:00Z').toLocaleDateString('en-US',{month:'short',day:'numeric',timeZone:'UTC'}));
+  mk('vSeries',{type:'line',data:{labels:lab,datasets:[
+    {label:'normal',data:ser.map(r=>r.normal_hi),borderColor:'rgba(154,166,191,.5)',borderWidth:1,pointRadius:0},
+    {label:'5 days before',data:ser.map(r=>r.m5_hi),borderColor:'#f5a623',borderDash:[5,4],borderWidth:1.5,pointRadius:0,tension:.25},
+    {label:'day before',data:ser.map(r=>r.m1_hi),borderColor:'#f5a623',borderWidth:2,pointRadius:0,tension:.25},
+    {label:'measured',data:ser.map(r=>r.obs_hi),borderColor:'#ef6868',backgroundColor:'#ef6868',borderWidth:2.2,pointRadius:2,tension:.25}]},
+    options:{responsive:true,maintainAspectRatio:false,animation:false,interaction:{mode:'index',intersect:false},
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:i=>`${i.dataset.label}: ${r0(i.parsed.y)}°`}}},
+      scales:{x:{ticks:{color:'#7d8aa5',maxTicksLimit:8,maxRotation:0},grid:{color:'rgba(255,255,255,.04)'}},y:{ticks:{color:'#7d8aa5',callback:y=>y+'°'},grid:{color:'rgba(255,255,255,.05)'}}}}});
+  $('v-note').innerHTML=`Measured: ${esc(v.truth)}. Model forecasts from Open-Meteo’s archive of its own past runs, since ${new Date(v.first+'T12:00:00Z').toLocaleDateString('en-US',{month:'long',day:'numeric',timeZone:'UTC'})}. ${v.nws_since?`National Weather Service forecasts saved here daily since ${new Date(v.nws_since+'T12:00:00Z').toLocaleDateString('en-US',{month:'long',day:'numeric',timeZone:'UTC'})}${nwsOK?'':'; their score appears once there are enough days to judge'}.`:''} “Same as N days before” means forecasting that the high will match the one measured N days earlier. Last 30 days alone: tomorrow’s ${what} off by ${f(v.last30?.['1']?.model?.[k]?.mae)}.`;
+}
+document.addEventListener('click',e=>{ const b=e.target.closest('#v-kind button'); if(!b) return; S.vKind=b.dataset.k; document.querySelectorAll('#v-kind button').forEach(x=>x.classList.toggle('on',x===b)); if(S.cur) renderVerify(S.cur); });
+
 function renderNWS(periods){
   if(!periods){ $('nws').innerHTML=''; return; }
   $('nws').innerHTML=periods.slice(0,6).map(p=>`<div class="per"><b>${esc(p.name)}</b>${esc(p.detailedForecast)}</div>`).join('');

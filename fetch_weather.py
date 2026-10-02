@@ -263,6 +263,28 @@ def main():
             with open(cpath, "w") as f:
                 json.dump(clim, f, separators=(",", ":"))
 
+    # forecast scoring: save today's NWS forecast (once a day), and re-score once a day after the
+    # overnight station reports are in (9 am Pacific); a new scoring version rebuilds straight away
+    import verify
+    from zoneinfo import ZoneInfo
+    for st in STATIONS:
+        try:
+            if verify.save_nws(get, st, now):
+                print(f"  saved today's NWS forecast for {st['name']}")
+        except Exception as e:
+            print(f"  NWS forecast archive {st['name']} failed: {e}")
+    local = now.astimezone(ZoneInfo("America/Los_Angeles"))
+    vold = json.load(open(verify.VERIFY_FILE)) if os.path.exists(verify.VERIFY_FILE) else {}
+    if vold.get("version") != verify.VERSION or (vold.get("built") != local.date().isoformat() and local.hour >= 9):
+        clim_now = json.load(open(cpath)) if os.path.exists(cpath) else {}
+        doc = verify.build(get, STATIONS, clim_now)
+        doc["built"] = local.date().isoformat()
+        for k, v in vold.get("stations", {}).items():   # keep yesterday's score for a station that failed today
+            doc["stations"].setdefault(k, v)
+        if doc["stations"]:
+            with open(verify.VERIFY_FILE, "w") as f:
+                json.dump(doc, f, separators=(",", ":"))
+
 
 if __name__ == "__main__":
     main()

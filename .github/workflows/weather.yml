@@ -38,7 +38,7 @@ jobs:
           git add data/
           git diff --quiet --cached && echo "No changes" && exit 0
           HOUR=$(date -u +%H)
-          CLIMATE=$(git diff --cached --name-only | grep climate.json || true)
+          CLIMATE=$(git diff --cached --name-only | grep -E "climate.json|verify.json|nws_forecasts.json" || true)   # daily files: always commit
           if [ -z "$CLIMATE" ] && [ $((10#$HOUR % 3)) -ne 0 ] && [ "${{ github.event_name }}" != "workflow_dispatch" ]; then
             echo "Snapshot only — the page reads live data; committing every 3 hours"; exit 0
           fi
