@@ -19,7 +19,7 @@ Four locations. Four climates. One dashboard to rule them all.
 | Station | Elev | The Vibe |
 |---------|------|----------|
 | **Lakewood, WA** | 300 ft | Home base. Pacific Northwest grey. The kind of place where "partly cloudy" is basically sunshine. |
-| **Groveland, CA** | 2,844 ft | Gateway to Yosemite. Pine trees, gold country air, and the town where I grew up chasing thunderstorms off the Sierra crest. |
+| **Sonora, CA** | 1,785 ft | Tuolumne County seat, gold country, the road up to Yosemite. Home turf: I grew up just down the road in Groveland, chasing thunderstorms off the Sierra crest. |
 | **Reno, NV** | 4,505 ft | High desert, big wind, bigger sky. Where a "partly sunny" forecast means the sun is fully trying to fight you. |
 | **Death Valley, CA** | -190 ft | The hottest place on Earth. Below sea level. The station sits at Furnace Creek, 190 ft below sea level, where the record books start in 1911 — and where it hit 134°F on July 10, 1913. We monitor this one for sport. |
 
@@ -30,7 +30,7 @@ This isn't your phone's weather app. This is the whole instrument panel — and 
 | Station | Measured at | Records from |
 |---|---|---|
 | Lakewood | McChord AFB (KTCM), 2 mi | Sea-Tac Airport, since 1945 |
-| Groveland | Mount Elizabeth RAWS (MOUC1), 15 mi, 2,100 ft higher — there's no official station closer | Sonora, since 1903 |
+| Sonora | Green Spring RAWS (GNSC1), 12 mi, about 700 ft lower — there's no NWS station in town | Sonora, since 1903 |
 | Reno | Reno–Tahoe airport (KRNO) | Reno, since 1893 |
 | Death Valley | Furnace Creek visitor center (DEVC1) | Death Valley, since 1911 |
 
@@ -50,7 +50,7 @@ This isn't your phone's weather app. This is the whole instrument panel — and 
 
 **Air quality, sun and moon** — US AQI and what's driving it, daylight and how fast it's changing, moon phase drawn to scale.
 
-**Any US place** — type a town in the search box and the page finds the nearest NWS station, forecast office and forecast for it.
+**Any US place** — type a town ("Bend", "Sonora, CA") or a ZIP, pick from the suggestions, and the page finds the nearest NWS stations, forecast office and forecast for it, with its own link.
 
 ## ⚙️ HOW IT WORKS
 
