@@ -48,7 +48,11 @@ This isn't your phone's weather app. This is the whole instrument panel — and 
 
 **How good is the forecast?** — every day the model's highs and lows 1–7 days ahead are scored against what the station measured (Open-Meteo's archive of its own past forecasts goes back to March 2026), beside two guesses a forecast should beat: the normal for the date, and "same as N days before". The National Weather Service's forecast is saved daily and joins the scoring as it builds up. Each forecast day shows how far off it usually is.
 
-**Against the record books** — the last 30 days of highs and lows against the normal range and the record high and low for every date (with the year), this month vs normal, and rain since October 1 against the water-year normal.
+**Radar, the last hour** — the NWS NEXRAD composite every five minutes from the Iowa Environmental Mesonet, looping over a dark Esri map centred on the selected place.
+
+**First freeze** — from each station's full history: the typical first 32° night, the 8-in-10 range, earliest and latest, the chance of one by today, this season so far, and the last spring freeze. Searched places too.
+
+**Against the record books** — the last 30 days of highs and lows against the normal range and the record high and low for every date (with the year), this month vs normal, and rain since October 1 against the water-year normal. The home stations' last 400 days get a neighbor check: a day that disagrees with every nearby station by more than 12° is set aside (Sonora's co-op thermometer logged a week of faulty lows in September 2026).
 
 **Air quality, sun and moon** — US AQI and what's driving it, daylight and how fast it's changing, moon phase drawn to scale.
 
@@ -93,6 +97,7 @@ The math is clear.
 
 - **Observations, alerts, forecasts, forecast discussions** — [NWS API](https://www.weather.gov/documentation/services-web-api) (free, no key, taxpayer-funded)
 - **Records and normals** — [ACIS](https://www.rcc-acis.org/) from NOAA's Regional Climate Centers
+- **Radar** — NWS NEXRAD composite via the [Iowa Environmental Mesonet](https://mesonet.agron.iastate.edu/); base map © Esri, HERE, Garmin, OpenStreetMap
 - **Backup for observations and forecast discussions** — [Iowa Environmental Mesonet](https://mesonet.agron.iastate.edu/), Iowa State University
 - **Hourly and 7-day forecasts, air quality** — [Open-Meteo](https://open-meteo.com/) (free, no key, open source)
 - **Moon phase** — calculated in the browser
