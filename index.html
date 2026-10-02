@@ -271,8 +271,16 @@ const hpa2inhg = h => h==null ? null : h*0.02953;
 const dir16 = d => d==null ? '' : ['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'][Math.round(d/22.5)%16];
 function ago(t){ const m=(Date.now()-t)/60000; if(m<1) return 'just now'; if(m<60) return Math.round(m)+' min ago'; if(m<48*60) return Math.round(m/60)+' h ago'; return Math.round(m/1440)+' d ago'; }
 function esc(s){ return String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
-async function J(url, accept){ const r=await fetch(url,{headers:accept?{Accept:accept}:{} ,cache:'no-store'}); if(!r.ok) throw new Error(r.status+' '+url); return r.json(); }
-const nws = path => J(NWS+path, 'application/geo+json');
+async function J(url, accept, tries=1){
+  // the NWS API often answers a first request for a new place with a 500 or a slow response, and works on a retry
+  for(let i=0;;i++){
+    const ctl=new AbortController(), to=setTimeout(()=>ctl.abort(),15000);
+    try{ const r=await fetch(url,{headers:accept?{Accept:accept}:{},cache:'no-store',signal:ctl.signal}); if(!r.ok) throw new Error(r.status+' '+url); return await r.json(); }
+    catch(e){ if(i>=tries-1 || /^(400|404) /.test(e.message)) throw e; await new Promise(res=>setTimeout(res,700*(i+1)*(i+1))); }
+    finally{ clearTimeout(to); }
+  }
+}
+const nws = path => J(NWS+path, 'application/geo+json', 3);
 
 // station-local time helpers (all four are Pacific, but searched places may not be)
 let TZOFF = -7*3600;   // seconds, replaced by Open-Meteo's utc_offset_seconds
@@ -291,8 +299,11 @@ async function getObs(st){
   for(const id of st.obs){
     try{
       const start=new Date(Date.now()-30*3600e3).toISOString();
-      const [lat, ser] = await Promise.all([nws(`/stations/${id}/observations/latest`), nws(`/stations/${id}/observations?start=${encodeURIComponent(start)}`)]);
-      const p=lat.properties; if(p.temperature?.value==null && p.windSpeed?.value==null) continue;
+      // latest and history separately: one failing shouldn't sink the other
+      const [latR, serR] = await Promise.allSettled([nws(`/stations/${id}/observations/latest`), nws(`/stations/${id}/observations?start=${encodeURIComponent(start)}`)]);
+      const ser=serR.status==='fulfilled'?serR.value:{features:[]};
+      const p=latR.status==='fulfilled'?latR.value.properties:(ser.features||[])[0]?.properties;
+      if(!p || (p.temperature?.value==null && p.windSpeed?.value==null)) continue;
       if(id!==st.obs[st.obs.length-1] && Date.now()-Date.parse(p.timestamp)>3*3600e3) continue;   // gone quiet: try the next one
       const series=(ser.features||[]).map(f=>obsRow(f.properties)).filter(o=>o.t).sort((a,b)=>a.t-b.t);
       let latest=obsRow(p);
@@ -383,7 +394,10 @@ function todaySoFar(series){
 }
 function renderNow(st,c){
   const o=c.obs?.latest, fc=c.fc;
-  if(!o){ $('now').innerHTML=`<div class="place">${esc(st.name)}${st.state?', '+esc(st.state):''}</div><div class="say">No live observation available right now${fc?'; showing the model only.':'.'}</div>`; return; }
+  if(!o){
+    $('now').innerHTML=`<div class="place">${esc(st.name)}${st.state?', '+esc(st.state):''}</div><div class="say">${st.custom&&!st.obs.length?'Couldn’t reach the National Weather Service for this place.':'The National Weather Service didn’t answer for the nearby stations.'} Trying again in a minute${fc?'; the forecast below is from the model meanwhile':''}.</div>`;
+    if(!S.retry){ S.retry=setTimeout(()=>{ S.retry=null; if(S.cur!==st) return; if(st.custom&&!st.obs.length) addCustom(st.lat,st.lon,st.name,st.state,st.elev); else select(st.key); },60e3); }
+    return; }
   const isDay = fc?.current?.is_day ?? 1;
   const modelSky = !skyText(o);
   const text = skyText(o) || (fc?WMO[fc.current.weather_code]?.[0]:'') || '';
