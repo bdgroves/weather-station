@@ -397,6 +397,7 @@ async function getAlerts(st){
 async function loadStation(st, quick){
   const c=S.cache[st.key]||(S.cache[st.key]={});
   const jobs=[getObs(st).then(v=>c.obs=v), getAlerts(st).then(v=>c.alerts=v)];
+  if(st.custom && !st.climP) st.climP=getClimate(st).then(cl=>{ st.clim=cl; st.climDone=true; if(S.cur===st) render(st); }).catch(e=>{ st.climDone=true; st.climErr=true; console.warn('climate',e.message); if(S.cur===st) render(st); });
   if(!quick || !c.fc || Date.now()-c.fcAt>30*60e3){ jobs.push(getForecast(st).then(v=>{c.fc=v;c.fcAt=Date.now();}), getAQ(st).then(v=>c.aq=v)); }
   if(!quick || !c.periods || Date.now()-c.nwsAt>60*60e3){ if(st.office) jobs.push(getNWSForecast(st).then(v=>{c.periods=v;c.nwsAt=Date.now();}), getAFD(st).then(v=>c.afd=v)); }
   await Promise.all(jobs.map(p=>p.catch(e=>console.warn(e))));
@@ -404,7 +405,45 @@ async function loadStation(st, quick){
 }
 
 // ═══ render ════════════════════════════════════════════════════════════════
-function climFor(st){ return S.clim?.stations?.[st.key]||null; }
+function climFor(st){ return st.custom ? (st.clim||null) : (S.clim?.stations?.[st.key]||null); }
+
+// ── records and normals for a searched place: the longest-running ACIS station nearby, built here
+//    the same way fetch_weather.py builds them for the four home stations
+const ACIS='https://data.rcc-acis.org';
+function acisVal(v){ if(v==null||v==='M'||v==='S'||v==='') return null; if(v==='T') return 0; const x=parseFloat(String(v).replace(/[ASTa]$/,'')); return Number.isNaN(x)?null:x; }
+async function getClimate(st){
+  const d=0.45, today=new Date().toISOString().slice(0,10), soon=new Date(Date.now()-60*86400e3).toISOString().slice(0,10);
+  const m=await J(`${ACIS}/StnMeta?bbox=${(st.lon-d).toFixed(2)},${(st.lat-d).toFixed(2)},${(st.lon+d).toFixed(2)},${(st.lat+d).toFixed(2)}&elems=maxt,mint&meta=name,uid,ll,elev,valid_daterange`,null,2);
+  const cands=(m.meta||[]).map(x=>{ const [a,b]=(x.valid_daterange||[])[0]||[]; return {...x, start:a, end:b,
+      mi:Math.hypot((x.ll[0]-st.lon)*Math.cos(st.lat*Math.PI/180),x.ll[1]-st.lat)*69}; })
+    .filter(x=>x.start && x.end>=soon && x.mi<=30);
+  if(!cands.length) return null;
+  // the longest record that covers the 1991–2020 normals period, nearer breaking ties
+  cands.sort((a,b)=>((a.start<='1991-01-01')===(b.start<='1991-01-01')?0:(a.start<='1991-01-01'?-1:1)) || a.start.localeCompare(b.start) || a.mi-b.mi);
+  const c=cands[0];
+  const r=await J(`${ACIS}/StnData?uid=${c.uid}&sdate=por&edate=${today}&elems=maxt,mint,pcpn&meta=name`,null,2);
+  const rows=r.data||[]; if(!rows.length) return null;
+  const by={}, keys=[];
+  for(let mo=1;mo<=12;mo++) for(let dd=1;dd<=31;dd++){ if([4,6,9,11].includes(mo)&&dd===31) continue; if(mo===2&&dd>29) continue; keys.push(`${String(mo).padStart(2,'0')}-${String(dd).padStart(2,'0')}`); }
+  const days=[];
+  for(const [date,a,b,p] of rows){ const md=date.slice(5), y=+date.slice(0,4), mx=acisVal(a), mn=acisVal(b), pc=acisVal(p);
+    const e=by[md]||(by[md]={hi:[],lo:[],pcpn:[]});
+    if(mx!=null) e.hi.push([mx,y]); if(mn!=null) e.lo.push([mn,y]); if(pc!=null&&y>=1991&&y<=2020) e.pcpn.push(pc);
+    days.push({date, hi:mx, lo:mn, pcpn:pc}); }
+  const win=(i,f)=>{ const v=[]; for(let k=i-7;k<=i+7;k++) for(const [x,y] of (by[keys[(k+keys.length)%keys.length]]?.[f]||[])) if(f==='pcpn'||(y>=1991&&y<=2020)) v.push(f==='pcpn'?x:x); return v; };
+  const winP=i=>{ const v=[]; for(let k=i-7;k<=i+7;k++) v.push(...(by[keys[(k+keys.length)%keys.length]]?.pcpn||[])); return v; };
+  const avg=a=>a.length?Math.round(a.reduce((s,x)=>s+x,0)/a.length*10)/10:null;
+  const out={};
+  keys.forEach((k,i)=>{ const e=by[k]; if(!e||!e.hi.length) return;
+    const rh=e.hi.reduce((m,t)=>t[0]>m[0]||(t[0]===m[0]&&t[1]>m[1])?t:m), rl=e.lo.length?e.lo.reduce((m,t)=>t[0]<m[0]||(t[0]===m[0]&&t[1]>m[1])?t:m):[null,null];
+    const pv=winP(i);
+    out[k]={normal_hi:avg(win(i,'hi')), normal_lo:avg(win(i,'lo')), record_hi:rh[0], record_hi_year:rh[1], record_lo:rl[0], record_lo_year:rl[1],
+            normal_pcpn:pv.length?Math.round(pv.reduce((s,x)=>s+x,0)/pv.length*1000)/1000:null}; });
+  const title=s=>/[a-z]/.test(s)?s:s.toLowerCase().replace(/\b\w/g,x=>x.toUpperCase());
+  const nm=title(c.name||'');
+  return {label:`${nm}${c.mi>=1?` (${Math.round(c.mi)} mi away)`:''}`, name:'', elev_ft:c.elev, first_year:+rows[0][0].slice(0,4),
+          last_date:[...days].reverse().find(x=>x.hi!=null)?.date||rows[rows.length-1][0], days:out, recent:days.slice(-400), built:today};
+}
 function clDay(st, md){ return climFor(st)?.days?.[md]||null; }
 
 function render(st){
@@ -591,7 +630,7 @@ function renderAFD(st,afd){
 }
 function renderClimate(st){
   const cl=climFor(st);
-  if(!cl){ $('clim-intro').textContent='Records and normals are kept for the four home stations.'; ['otd','month','wy'].forEach(id=>$(id).innerHTML='<div class="note">—</div>'); mk('climChart',{type:'line',data:{datasets:[]}}); $('c-sub').textContent=''; return; }
+  if(!cl){ $('clim-intro').textContent=st.custom&&!st.climDone?'Looking up the records for the nearest long-running weather station…':st.custom&&st.climErr?'Couldn’t reach the climate database (ACIS) just now.':st.custom?'No long-running weather station with daily records was found within 30 miles of this place.':'Records and normals are unavailable right now.'; ['otd','month','wy'].forEach(id=>$(id).innerHTML='<div class="note">—</div>'); mk('climChart',{type:'line',data:{datasets:[]}}); $('c-sub').textContent=''; return; }
   $('clim-intro').innerHTML=`Daily records from <b>${esc(cl.label)}</b>${cl.name&&!cl.label.toLowerCase().startsWith(cl.name.toLowerCase())?', '+esc(cl.name):''} — kept since ${cl.first_year}. Normals are the 1991–2020 average, smoothed over two weeks.`;
   const rec=cl.recent.slice(-31);
   const labels=rec.map(r=>r.date.slice(5)); const lbl=rec.map(r=>new Date(r.date+'T12:00:00Z').toLocaleDateString('en-US',{month:'short',day:'numeric',timeZone:'UTC'}));
@@ -680,7 +719,7 @@ function renderFresh(st,c){
     ['Forecast (Open-Meteo)', c.fcAt, c.fc?.live, 60],
     ['NWS forecast', c.nwsAt, !!c.periods, 120],
     ['Forecast discussion', c.afd?Date.parse(c.afd.issuanceTime):null, !!c.afd, 24*60],
-    ['Records (ACIS)', climFor(st)?Date.parse(S.clim.built+'T12:00:00Z'):null, !!climFor(st), 2*24*60],
+    ['Records (ACIS)', climFor(st)?Date.parse((climFor(st).built||S.clim?.built)+'T12:00:00Z'):null, !!climFor(st), 2*24*60],
     ['Backup copy', S.snap?Date.parse(S.snap.generated_utc):null, !!S.snap, 6*60],
   ];
   $('fresh').innerHTML=items.map(([n,t,ok,lim])=>{ const age=t?(Date.now()-t)/60000:null; const cls=!t?'bad':!ok||age>lim?'st':''; return `<span class="${cls}">${n}: ${t?ago(t):'unavailable'}${ok===false&&t?' (backup)':''}</span>`; }).join('');

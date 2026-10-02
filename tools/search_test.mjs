@@ -24,9 +24,10 @@ for (const [q, vp] of QS.map((q, i) => [q, i % 2 ? 390 : 1440])) {
   else if (q === 'Bend' && !process.env.QS) { await p.click('.search button'); }
   else await p.press('#q', 'Enter');
   await p.waitForTimeout(9000);
-  const info = await p.evaluate(() => ({ afd: (document.getElementById('afd')?.innerText || '').slice(0, 80), hash: location.hash, place: document.querySelector('.now .place')?.textContent, say: document.querySelector('#now')?.innerText.slice(0, 300), live: document.getElementById('live')?.textContent, msg: document.getElementById('smsg')?.hidden ? '' : document.getElementById('smsg')?.textContent, tabsScroll: document.getElementById('tabs').scrollLeft, obs: (typeof S !== 'undefined' && S.custom) ? S.custom.obs.map(id => id + ' ' + JSON.stringify(S.custom.obsInfo[id])) : null }));
+  await p.waitForTimeout(8000);
+  const info = await p.evaluate(() => ({ clim: (document.getElementById('clim-intro')?.innerText || '') + ' || ' + (document.getElementById('otd')?.innerText || '').replace(/\n/g, ' ').slice(0, 160) + ' || ' + (document.getElementById('month')?.innerText || '').replace(/\n/g, ' ').slice(0, 120) + ' || ' + (document.getElementById('wy')?.innerText || '').replace(/\n/g, ' ').slice(0, 120), afd: (document.getElementById('afd')?.innerText || '').slice(0, 80), hash: location.hash, place: document.querySelector('.now .place')?.textContent, say: document.querySelector('#now')?.innerText.slice(0, 300), live: document.getElementById('live')?.textContent, msg: document.getElementById('smsg')?.hidden ? '' : document.getElementById('smsg')?.textContent, tabsScroll: document.getElementById('tabs').scrollLeft, obs: (typeof S !== 'undefined' && S.custom) ? S.custom.obs.map(id => id + ' ' + JSON.stringify(S.custom.obsInfo[id])) : null }));
   log.push(`${q} result: ${JSON.stringify(info)}`);
-  await p.screenshot({ path: `tools/shots/search-${q.replace(/\W+/g, '_')}.png`, fullPage: false });
+  await p.screenshot({ path: `tools/shots/search-${q.replace(/\W+/g, '_')}.png`, fullPage: true });
 }
 fs.writeFileSync('tools/shots/errors.txt', log.join('\n'));
 await b.close();
