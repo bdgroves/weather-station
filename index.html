@@ -412,7 +412,7 @@ function climFor(st){ return st.custom ? (st.clim||null) : (S.clim?.stations?.[s
 const ACIS='https://data.rcc-acis.org';
 function acisVal(v){ if(v==null||v==='M'||v==='S'||v==='') return null; if(v==='T') return 0; const x=parseFloat(String(v).replace(/[ASTa]$/,'')); return Number.isNaN(x)?null:x; }
 async function getClimate(st){
-  const d=0.45, today=new Date().toISOString().slice(0,10), soon=new Date(Date.now()-60*86400e3).toISOString().slice(0,10);
+  const d=0.45, today=new Date().toISOString().slice(0,10), soon=new Date(Date.now()-120*86400e3).toISOString().slice(0,10);   // co-op reports can lag weeks
   const m=await J(`${ACIS}/StnMeta?bbox=${(st.lon-d).toFixed(2)},${(st.lat-d).toFixed(2)},${(st.lon+d).toFixed(2)},${(st.lat+d).toFixed(2)}&elems=maxt,mint&meta=name,uid,ll,elev,valid_daterange`,null,2);
   const cands=(m.meta||[]).map(x=>{ const [a,b]=(x.valid_daterange||[])[0]||[]; return {...x, start:a, end:b,
       mi:Math.hypot((x.ll[0]-st.lon)*Math.cos(st.lat*Math.PI/180),x.ll[1]-st.lat)*69}; })
@@ -420,9 +420,19 @@ async function getClimate(st){
   if(!cands.length) return null;
   // the longest record that covers the 1991–2020 normals period, nearer breaking ties
   cands.sort((a,b)=>((a.start<='1991-01-01')===(b.start<='1991-01-01')?0:(a.start<='1991-01-01'?-1:1)) || a.start.localeCompare(b.start) || a.mi-b.mi);
-  const c=cands[0];
-  const r=await J(`${ACIS}/StnData?uid=${c.uid}&sdate=por&edate=${today}&elems=maxt,mint,pcpn&meta=name`,null,2);
-  const rows=r.data||[]; if(!rows.length) return null;
+  // a long record can still have no 1991–2020 data: try up to three, keep the first with normals for most of the year
+  let best=null;
+  for(const c of cands.slice(0,3)){
+    const r=await J(`${ACIS}/StnData?uid=${c.uid}&sdate=por&edate=${today}&elems=maxt,mint,pcpn&meta=name`,null,2);
+    const cl=buildClim(c, r.data||[], today); if(!cl) continue;
+    const cover=Object.values(cl.days).filter(x=>x.normal_hi!=null).length/366;
+    if(!best || cover>best.cover) best={cl,cover};
+    if(cover>=0.8) break;
+  }
+  return best?.cl||null;
+}
+function buildClim(c, rows, today){
+  if(!rows.length) return null;
   const by={}, keys=[];
   for(let mo=1;mo<=12;mo++) for(let dd=1;dd<=31;dd++){ if([4,6,9,11].includes(mo)&&dd===31) continue; if(mo===2&&dd>29) continue; keys.push(`${String(mo).padStart(2,'0')}-${String(dd).padStart(2,'0')}`); }
   const days=[];
@@ -660,20 +670,22 @@ function renderClimate(st){
     const hi=avg(mrows.map(r=>r.hi)), lo=avg(mrows.map(r=>r.lo)), nhi=avg(mrows.map(r=>cl.days[r.date.slice(5)]?.normal_hi)), nlo=avg(mrows.map(r=>cl.days[r.date.slice(5)]?.normal_lo));
     const p=mrows.reduce((s,r)=>s+(r.pcpn||0),0), np=mrows.reduce((s,r)=>s+(cl.days[r.date.slice(5)]?.normal_pcpn||0),0);
     const mname=new Date(ym+'-15T12:00:00Z').toLocaleDateString('en-US',{month:'long',timeZone:'UTC'});
-    const dep=((hi-nhi)+(lo-nlo))/2;
-    $('month').innerHTML=`<div class="big-line" style="font:500 1.9rem var(--fd);color:${dep>1?'var(--orange)':dep<-1?'var(--blue)':'var(--t1)'}">${dep>0?'+':''}${dep.toFixed(1)}°</div>
-      <div class="note">${mname} so far (${mrows.length} day${mrows.length>1?'s':''}) vs normal · average high ${r0(hi)}° (normal ${r0(nhi)}°), low ${r0(lo)}° (normal ${r0(nlo)}°)</div>
-      <div class="note" style="margin-top:8px">Rain <b style="color:var(--t1)">${p.toFixed(2)}"</b> vs ${np.toFixed(2)}" normal to date</div>`;
+    const dep=nhi==null||nlo==null||hi==null||lo==null?null:((hi-nhi)+(lo-nlo))/2;
+    const mMiss=mrows.filter(r=>r.pcpn==null).length;
+    $('month').innerHTML=`<div class="big-line" style="font:500 1.9rem var(--fd);color:${dep>1?'var(--orange)':dep<-1?'var(--blue)':'var(--t1)'}">${dep==null?'—':(dep>0?'+':'')+dep.toFixed(1)+'°'}</div>
+      <div class="note">${mname} so far (${mrows.length} day${mrows.length>1?'s':''})${dep==null?' · this station has no 1991–2020 normals to compare with':` vs normal · average high ${r0(hi)}° (normal ${r0(nhi)}°), low ${r0(lo)}° (normal ${r0(nlo)}°)`}</div>
+      <div class="note" style="margin-top:8px">Rain <b style="color:var(--t1)">${p.toFixed(2)}"</b> vs ${np.toFixed(2)}" normal to date${mMiss?` <span class="muted">(${mMiss} day${mMiss>1?'s':''} not reported)</span>`:''}</div>`;
   }
   // water year
   const wyStart=(()=>{ const d=new Date((cl.last_date||'2026-10-01')+'T12:00:00Z'); const y=d.getUTCMonth()>=9?d.getUTCFullYear():d.getUTCFullYear()-1; return `${y}-10-01`; })();
   const wr=cl.recent.filter(r=>r.date>=wyStart);
   const wp=wr.reduce((s,r)=>s+(r.pcpn||0),0), wn=wr.reduce((s,r)=>s+(cl.days[r.date.slice(5)]?.normal_pcpn||0),0);
+  const wMiss=wr.filter(r=>r.pcpn==null).length, wGappy=wr.length>=10 && wMiss/wr.length>0.1;   // too many unreported days to trust a total
   let yearNormal=0; Object.values(cl.days).forEach(d=>yearNormal+=d.normal_pcpn||0);
-  const pct=wn>=0.5?Math.round(100*wp/wn):null;   // a % of a tiny normal means nothing
+  const pct=wn>=0.5&&!wGappy?Math.round(100*wp/wn):null;   // a % of a tiny normal means nothing
   $('wy').innerHTML=`<div style="font:500 1.9rem var(--fd)">${wp.toFixed(2)}"<span style="font-size:1rem;color:var(--t2)"> ${pct!=null?`· ${pct}% of normal`:''}</span></div>
     <div class="bar2"><i style="width:${Math.min(100,100*wp/Math.max(yearNormal,0.01))}%;background:var(--blue)"></i><em style="left:${Math.min(100,100*wn/Math.max(yearNormal,0.01))}%"></em></div>
-    <div class="note" style="margin-top:8px">Since Oct 1: ${wp.toFixed(2)}" against ${wn.toFixed(2)}" normal by now (white tick). A whole normal year brings about <b style="color:var(--t1)">${yearNormal.toFixed(1)}"</b>.${wr.length<5?' The water year has only just begun.':''}</div>`;
+    <div class="note" style="margin-top:8px">Since Oct 1, ${wyStart.slice(0,4)}: ${wp.toFixed(2)}" against ${wn.toFixed(2)}" normal by now (white tick). A whole normal year brings about <b style="color:var(--t1)">${yearNormal.toFixed(1)}"</b>.${wr.length<5?' The water year has only just begun.':''}${wGappy?` <span class="muted">${wMiss} of ${wr.length} days weren’t reported here, so the total runs low.</span>`:''}</div>`;
 }
 function renderAQ(aq){
   if(!aq?.current){ $('aq').innerHTML='<div class="note">Air quality unavailable.</div>'; return; }
