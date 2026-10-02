@@ -12,6 +12,8 @@ for (const [name, vp, hash] of [['desk', { width: 1440, height: 900 }, ''], ['ph
   await p.waitForTimeout(3000);
   errs.push(`${name} status: ` + await p.evaluate(() => (document.getElementById('live')?.textContent || '?') + ' | ' + (document.getElementById('live-sub')?.textContent || '')));
   await p.screenshot({ path: `tools/shots/${name}.png`, fullPage: true });
+  const v = await p.$('#v-sec'); if (v) await v.screenshot({ path: `tools/shots/${name}-verify.png` });
+  errs.push(`${name} verify: ` + await p.evaluate(() => document.getElementById('v-say')?.innerText || ''));
 }
 fs.writeFileSync('tools/shots/errors.txt', errs.join('\n'));
 await b.close();
