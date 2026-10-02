@@ -458,7 +458,9 @@ function buildClim(c, rows, today, older=[]){
     const pv=winP(i);
     out[k]={normal_hi:avg(win(i,'hi')), normal_lo:avg(win(i,'lo')), record_hi:rh[0], record_hi_year:rh[1], record_lo:rl[0], record_lo_year:rl[1],
             normal_pcpn:pv.length?Math.round(pv.reduce((s,x)=>s+x,0)/pv.length*1000)/1000:null}; });
-  const title=s=>/[a-z]/.test(s)?s:s.toLowerCase().replace(/\b\w/g,x=>x.toUpperCase());
+  // station names arrive in capitals: title-case them, keeping abbreviations and directions (AP, NP, HQS, 2N, WSW) as they are
+  const ABBR=/^(AP|NP|HQS|AFB|WSO|WSMO|RAWS|CCC|USFS|CO|NWS|FAA|USAF|NAS|NWR|WLR|RS|[NSEW]{1,3}|\d+[NSEW]{1,3}|\d+[A-Z]*)$/;
+  const title=s=>/[a-z]/.test(s)?s:s.split(/(\s+|-|\/)/).map(w=>ABBR.test(w)?w:w.charAt(0)+w.slice(1).toLowerCase()).join('');
   const nm=title(c.name||''), first=olderRows.length?olderRows.reduce((m,r)=>r[0]<m?r[0]:m,rows[0][0]):rows[0][0];
   const joined=older.length?`, with earlier records from ${older.map(o=>title(o.h.name)).join(' and ')}`:'';
   return {label:`${nm}${c.mi>=1?` (${Math.round(c.mi)} mi away)`:''}${joined}`, name:'', elev_ft:c.elev, first_year:+first.slice(0,4),
@@ -688,7 +690,7 @@ function renderClimate(st){
   }
   // water year
   const wyStart=(()=>{ const d=new Date((cl.last_date||'2026-10-01')+'T12:00:00Z'); const y=d.getUTCMonth()>=9?d.getUTCFullYear():d.getUTCFullYear()-1; return `${y}-10-01`; })();
-  const wr=cl.recent.filter(r=>r.date>=wyStart);
+  const wr=cl.recent.filter(r=>r.date>=wyStart&&r.date<=(cl.last_date||'9999'));
   const wp=wr.reduce((s,r)=>s+(r.pcpn||0),0), wn=wr.reduce((s,r)=>s+(cl.days[r.date.slice(5)]?.normal_pcpn||0),0);
   const wMiss=wr.filter(r=>r.pcpn==null).length, wGappy=wr.length>=10 && wMiss/wr.length>0.1;   // too many unreported days to trust a total
   let yearNormal=0; Object.values(cl.days).forEach(d=>yearNormal+=d.normal_pcpn||0);
