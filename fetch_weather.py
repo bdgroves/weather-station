@@ -81,11 +81,14 @@ def latest_obs(st):
     for sid in st["obs"]:
         try:
             # the newest report can be partial (no temperature), so take the newest complete one of the last few
-            feats = get(f"https://api.weather.gov/stations/{sid}/observations?limit=6")["features"]
+            feats = get(f"https://api.weather.gov/stations/{sid}/observations?limit=15")["features"]
             full = [f["properties"] for f in feats if (f["properties"].get("temperature") or {}).get("value") is not None]
             if not full:
                 continue
-            p = full[0]
+            p = dict(full[0])
+            for k in ("seaLevelPressure", "barometricPressure", "visibility"):   # short reports between hourly ones lack these
+                if (p.get(k) or {}).get("value") is None:
+                    p[k] = next((f["properties"][k] for f in feats if (f["properties"].get(k) or {}).get("value") is not None), None)
             v = lambda k: (p.get(k) or {}).get("value")
             return {"station": sid, "name": p.get("stationName"), "time": p.get("timestamp"),
                     "text": p.get("textDescription") or None, "temp": c2f(v("temperature")),
