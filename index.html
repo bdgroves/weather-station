@@ -301,18 +301,18 @@ async function iemStations(state){
   S.iemNet=S.iemNet||{}; if(!S.iemNet[state]) S.iemNet[state]=T(`${IEM}/geojson/network/${state}_ASOS.geojson`).then(JSON.parse).catch(e=>{ delete S.iemNet[state]; throw e; });
   return (await S.iemNet[state]).features||[];
 }
-async function iemObs(sid){
-  const flds=['tmpf','dwpf','relh','sknt','drct','gust','mslp','vsby','skyc1','skyl1','skyc2','skyl2','feel'];
-  const csv=await T(`${IEM}/cgi-bin/request/asos.py?station=${sid}&${flds.map(f=>'data='+f).join('&')}&tz=Etc/UTC&format=onlycomma&latlon=no&missing=empty&trace=empty&hours=30`);
-  const [head,...lines]=csv.trim().split('\n'); const H=head.split(',');
-  const num=x=>x===''||x==null?null:+x;
-  const series=lines.map(l=>{ const a=l.split(','), g=k=>a[H.indexOf(k)];
-    const temp=num(g('tmpf')), feel=num(g('feel'));
-    return {t:Date.parse(g('valid').replace(' ','T')+':00Z'), temp, dew:num(g('dwpf')), rh:num(g('relh')),
-      wind:g('sknt')===''?null:+g('sknt')*1.15078, gust:g('gust')===''?null:+g('gust')*1.15078, dir:num(g('drct')),
-      press:num(g('mslp')), vis:num(g('vsby')), text:'', hi:temp!=null&&feel!=null&&feel>temp?feel:null, wc:temp!=null&&feel!=null&&feel<temp?feel:null,
-      clouds:[[g('skyc1'),g('skyl1')],[g('skyc2'),g('skyl2')]].filter(c=>c[0]).map(c=>({amt:c[0],ft:num(c[1])}))}; })
-    .filter(o=>o.t).sort((a,b)=>a.t-b.t);
+async function iemObs(sid, net, lon){
+  // today's and yesterday's reports (station-local dates) from the Mesonet's observation history API
+  const day=k=>new Date(Date.now()+(lon/15)*3600e3-k*86400e3).toISOString().slice(0,10);
+  const rows=[];
+  for(const k of [0,1]){ try{ rows.push(...(JSON.parse(await T(`${IEM}/api/1/obhistory.json?station=${sid}&network=${net}&date=${day(k)}`)).data||[])); }catch(e){ if(k===0) throw e; } }
+  const num=x=>x===''||x==null||Number.isNaN(+x)?null:+x;
+  const series=rows.map(g=>{ const temp=num(g.tmpf), feel=num(g.feel);
+    return {t:Date.parse(/[Zz]|[+-]\d\d:?\d\d$/.test(g.utc_valid||'')?g.utc_valid:(g.utc_valid||'').replace(' ','T')+'Z'), temp, dew:num(g.dwpf), rh:num(g.relh),
+      wind:num(g.sknt)!=null?g.sknt*1.15078:null, gust:num(g.gust)!=null?g.gust*1.15078:null, dir:num(g.drct),
+      press:num(g.mslp), vis:num(g.vsby), text:'', hi:temp!=null&&feel!=null&&feel>temp?feel:null, wc:temp!=null&&feel!=null&&feel<temp?feel:null,
+      clouds:[[g.skyc1,g.skyl1],[g.skyc2,g.skyl2],[g.skyc3,g.skyl3]].filter(c=>c[0]).map(c=>({amt:c[0],ft:num(c[1])}))}; })
+    .filter(o=>o.t&&Date.now()-o.t<30*3600e3).sort((a,b)=>a.t-b.t);
   let latest=[...series].reverse().find(o=>o.temp!=null); if(!latest || Date.now()-latest.t>3*3600e3) return null;
   const recent=[...series].reverse().filter(o=>latest.t-o.t<90*60e3);
   for(const k of ['press','vis','dew','rh']) if(latest[k]==null){ const r=recent.find(o=>o[k]!=null); if(r) latest={...latest,[k]:r[k]}; }
@@ -360,8 +360,8 @@ async function getObs(st){
     }catch(e){ console.warn('obs',id,e.message); }
   }
   for(const id of st.obs){   // NWS unreachable: the same station's reports from the Iowa Environmental Mesonet
-    const sid=st.iem?.[id] || (/^K[A-Z0-9]{3}$/.test(id)?id.slice(1):null); if(!sid) continue;
-    try{ const r=await iemObs(sid); if(r) return {id, ...r, live:true, via:'Iowa Environmental Mesonet'}; }catch(e){ console.warn('iem',id,e.message); }
+    const sid=st.iem?.[id] || (/^K[A-Z0-9]{3}$/.test(id)?id.slice(1):null); if(!sid || !/^[A-Z]{2}$/.test(st.state||'')) continue;
+    try{ const r=await iemObs(sid, st.iemNet?.[id]||st.state+'_ASOS', st.lon); if(r) return {id, ...r, live:true, via:'Iowa Environmental Mesonet'}; }catch(e){ console.warn('iem',id,e.message); }
   }
   const o=S.snap?.stations?.[st.key]?.observed;   // backup copy from the hourly Action
   if(o) return {id:o.station, latest:{t:Date.parse(o.time),temp:o.temp,dew:o.dewpoint,rh:o.humidity,wind:o.wind_mph,gust:o.gust_mph,dir:o.wind_dir,press:o.pressure_hpa,vis:o.visibility_mi,text:o.text,hi:o.heat_index,wc:o.wind_chill,clouds:[]}, series:[], live:false};
@@ -761,9 +761,9 @@ async function addCustom(lat, lon, name, state, elev){
       const title=s=>/[a-z]/.test(s)?s:s.toLowerCase().replace(/\b\w/g,c=>c.toUpperCase());
       const pre=state==='AK'?'PA':state==='HI'?'PH':'K';
       const near=(await iemStations(state)).filter(f=>f.properties.online!==false && !f.properties.archive_end).map(f=>{ const [x,y]=f.geometry.coordinates, sid=f.properties.sid;
-          return {sid, id:sid.length===3?pre+sid:sid, name:title(f.properties.sname||''), wfo:f.properties.wfo, mi:Math.round(Math.hypot((x-lon)*Math.cos(lat*Math.PI/180),(y-lat))*69)}; })
+          return {sid, id:sid.length===3?pre+sid:sid, net:f.properties.network, name:title(f.properties.sname||''), wfo:f.properties.wfo, mi:Math.round(Math.hypot((x-lon)*Math.cos(lat*Math.PI/180),(y-lat))*69)}; })
         .sort((a,b)=>a.mi-b.mi).slice(0,4);
-      st.obs=near.map(n=>n.id); st.iem={}; near.forEach(n=>{ st.iem[n.id]=n.sid; st.obsInfo[n.id]=[n.name,n.mi]; }); st.office=near[0]?.wfo||null;
+      st.obs=near.map(n=>n.id); st.iem={}; st.iemNet={}; near.forEach(n=>{ st.iem[n.id]=n.sid; st.iemNet[n.id]=n.net; st.obsInfo[n.id]=[n.name,n.mi]; }); st.office=near[0]?.wfo||null;
     }catch(e2){ console.warn('iem stations',e2.message); }
   }
   S.custom=st; delete S.cache.custom; select('custom');
