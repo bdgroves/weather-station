@@ -212,6 +212,72 @@ def freeze_stats(days, thresh=32.0):
     return out
 
 
+def neighbor_qc(rows, meta, today, days=400, limit=12.0):
+    """Set aside recent daily highs/lows that disagree with every nearby station.
+
+    A co-op thermometer can fail for days at a time (Sonora logged lows of 33-37°F on Sept 16-22, 2026,
+    while Columbia airport, 3 miles away, logged 48-55°F). For the last `days` days, each value is compared
+    with the median of stations within about 20 miles, after removing this station's usual offset from them
+    (a valley station really is colder at night); a value more than `limit` °F off that, with at least
+    two neighbors reporting, is replaced with missing. Older history is left as published.
+    """
+    ll = meta.get("ll")
+    if not ll or not rows:
+        return rows, []
+    lon, lat = ll
+    start = (today - dt.timedelta(days=days)).isoformat()
+    try:
+        m = get("https://data.rcc-acis.org/MultiStnData",
+                {"bbox": f"{lon - .35:.2f},{lat - .3:.2f},{lon + .35:.2f},{lat + .3:.2f}", "sdate": start, "edate": today.isoformat(),
+                 "elems": "maxt,mint", "meta": "name,sids"}, accept="application/json")
+    except Exception as e:
+        print(f"    QC skipped: {e}")
+        return rows, []
+    own = set(meta.get("sids") or [])
+    dates = [(dt.date.fromisoformat(start) + dt.timedelta(days=i)).isoformat() for i in range(days + 1)]
+    nb = []                                   # per neighbor: {date: (hi, lo)}
+    for stn in m.get("data", []):
+        if own & set(stn.get("meta", {}).get("sids") or []):
+            continue
+        vals = {}
+        for dte, (a, b) in zip(dates, stn.get("data", [])):
+            vals[dte] = (acis_val(a if not isinstance(a, list) else a[0]), acis_val(b if not isinstance(b, list) else b[0]))
+        nb.append(vals)
+    idx = {r[0]: i for i, r in enumerate(rows)}
+    out = [list(r) for r in rows]
+    flagged = []
+    for k, name in ((1, "high"), (2, "low")):
+        diffs = {}
+        for dte in dates:
+            if dte not in idx:
+                continue
+            v = acis_val(rows[idx[dte]][k])
+            ns = sorted(x for x in (n.get(dte, (None, None))[k - 1] for n in nb) if x is not None)
+            if v is None or len(ns) < 2:
+                continue
+            diffs[dte] = v - ns[len(ns) // 2]
+        if len(diffs) < 30:
+            continue
+        typical = sorted(diffs.values())[len(diffs) // 2]
+        bad = {dte for dte, dfx in diffs.items() if abs(dfx - typical) > limit}
+        # faulty instruments fail for runs of days: widen each flagged run to neighbouring days that are off
+        # the same way by more than 60% of the limit
+        grew = True
+        while grew:
+            grew = False
+            for dte in list(bad):
+                sign = 1 if diffs[dte] - typical > 0 else -1
+                for step in (-1, 1):
+                    nxt = (dt.date.fromisoformat(dte) + dt.timedelta(days=step)).isoformat()
+                    if nxt in diffs and nxt not in bad and sign * (diffs[nxt] - typical) > 0.6 * limit:
+                        bad.add(nxt)
+                        grew = True
+        for dte in bad:
+            out[idx[dte]][k] = "M"
+            flagged.append(f"{dte} {name}")
+    return [tuple(r) for r in out], sorted(flagged)
+
+
 def climate(st):
     sid = st["climate"]["sid"]
     today = dt.date.today()
@@ -220,6 +286,9 @@ def climate(st):
             accept="application/json")
     rows = d.get("data", [])
     meta = d.get("meta", {})
+    rows, flagged = neighbor_qc(rows, meta, today)
+    if flagged:
+        print(f"    QC: set aside {len(flagged)} values that disagree with every nearby station: {', '.join(flagged[:8])}{'…' if len(flagged) > 8 else ''}")
     by_md = {}                                   # "MM-DD" → lists
     days = []
     for date, mx, mn, pc, sn in rows:
@@ -321,8 +390,9 @@ def main():
     old = json.load(open(cpath)) if os.path.exists(cpath) else {}
     labels_changed = any(old.get("stations", {}).get(st["key"], {}).get("label") != st["climate"]["label"] for st in STATIONS)
     missing_freeze = any("freeze" not in v for v in old.get("stations", {}).values())   # new field: rebuild once
-    if old.get("built") != now.date().isoformat() or labels_changed or missing_freeze:
-        clim = {"built": now.date().isoformat(), "stations": {}}
+    QC_VERSION = 1   # bump to rebuild after a change to neighbor_qc
+    if old.get("built") != now.date().isoformat() or labels_changed or missing_freeze or old.get("qc") != QC_VERSION:
+        clim = {"built": now.date().isoformat(), "qc": QC_VERSION, "stations": {}}
         for st in STATIONS:
             try:
                 c = climate(st)

@@ -21,14 +21,16 @@ from zoneinfo import ZoneInfo
 OUT = os.path.join(os.path.dirname(__file__), "data")
 NWS_FILE = os.path.join(OUT, "nws_forecasts.json")
 VERIFY_FILE = os.path.join(OUT, "verify.json")
-VERSION = 1
+VERSION = 2
 LEADS = range(1, 8)
 
 # Where each home station's daily high/low comes from: the station closest to the forecast point
 # with a complete daily record (ACIS stopped receiving McChord's daily summaries in September 2026).
 TRUTH = {
     "lakewood_wa": {"src": "iem", "station": "TCM", "network": "WA_ASOS", "label": "McChord AFB (KTCM)"},
-    "sonora_ca": {"src": "acis", "sid": "048353 2", "label": "the Sonora co-op station"},
+    # Columbia airport, 3 miles from Sonora: an automated station that reports every day. The Sonora co-op
+    # station misses about a third of days and logged a week of faulty lows in September 2026.
+    "sonora_ca": {"src": "iem", "station": "O22", "network": "CA_ASOS", "label": "Columbia airport (O22), 3 miles from Sonora"},
     "reno_nv": {"src": "iem", "station": "RNO", "network": "NV_ASOS", "label": "Reno–Tahoe airport (KRNO)"},
     "death_valley_ca": {"src": "acis", "sid": "042319 2", "label": "Death Valley (Furnace Creek)"},
 }
