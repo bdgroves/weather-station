@@ -1,5 +1,10 @@
 name: Screenshots
-on: workflow_dispatch
+on:
+  workflow_dispatch:
+    inputs:
+      script:
+        description: script to run
+        default: tools/shoot.mjs
 permissions:
   contents: write
 jobs:
@@ -10,7 +15,7 @@ jobs:
       - uses: actions/setup-node@v4
         with: { node-version: '20' }
       - run: npm i playwright@1.47 && npx playwright install --with-deps chromium
-      - run: mkdir -p tools/shots && node tools/shoot.mjs
+      - run: mkdir -p tools/shots && node ${{ inputs.script || 'tools/shoot.mjs' }}
       - name: Publish to the shots branch (keeps main clean)
         run: |
           git config user.name "github-actions[bot]"
