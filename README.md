@@ -2,7 +2,7 @@
 
 ### *"We got cows."*
 
-**[🔴 LIVE DASHBOARD → bdgroves.github.io/weather-station](https://bdgroves.github.io/weather-station)**
+**[🔴 LIVE DASHBOARD → brooksgroves.com/weather-station](https://brooksgroves.com/weather-station/)**
 
 ---
 
@@ -10,7 +10,7 @@ Look — I'm not made of money. A Davis Vantage Pro2 runs $700. A WeatherFlow Te
 
 This is that something.
 
-**Weather Station** is a high-end, real-time weather dashboard that monitors four stations across the American West — from the soggy Pacific Northwest to the surface of the actual sun (Death Valley). It runs 24/7, updates every 15 minutes, and looks like something you'd see bolted to a wall in a NOAA operations center. Except it's free. And it lives on GitHub Pages. And nobody had to drive into a tornado to get the data.
+**Weather Station** is a high-end, real-time weather dashboard that monitors four stations across the American West — from the soggy Pacific Northwest to the surface of the actual sun (Death Valley). It runs 24/7, reads live National Weather Service observations every 5 minutes, and looks like something you'd see bolted to a wall in a NOAA operations center. Except it's free. And it lives on GitHub Pages. And nobody had to drive into a tornado to get the data.
 
 ## 📡 THE STATIONS
 
@@ -21,58 +21,50 @@ Four locations. Four climates. One dashboard to rule them all.
 | **Lakewood, WA** | 300 ft | Home base. Pacific Northwest grey. The kind of place where "partly cloudy" is basically sunshine. |
 | **Groveland, CA** | 2,844 ft | Gateway to Yosemite. Pine trees, gold country air, and the town where I grew up chasing thunderstorms off the Sierra crest. |
 | **Reno, NV** | 4,505 ft | High desert, big wind, bigger sky. Where a "partly sunny" forecast means the sun is fully trying to fight you. |
-| **Death Valley, CA** | -282 ft | The hottest place on Earth. Below sea level. The barometric pressure here is *higher* than sea level because you're in a geological hole. We monitor this one for sport. |
+| **Death Valley, CA** | -190 ft | The hottest place on Earth. Below sea level. The station sits at Furnace Creek, 190 ft below sea level, where the record books start in 1911 — and where it hit 134°F on July 10, 1913. We monitor this one for sport. |
 
 ## 🛰️ WHAT'S ON THE DASHBOARD
 
-This isn't your phone's weather app. This is the whole instrument panel.
+This isn't your phone's weather app. This is the whole instrument panel — and now it's measured, not modelled.
 
-**Current Conditions** — Temperature, feels like, humidity, dew point, cloud cover. The basics, but rendered like they belong on a broadcast.
+| Station | Measured at | Records from |
+|---|---|---|
+| Lakewood | McChord AFB (KTCM), 2 mi | Sea-Tac Airport, since 1945 |
+| Groveland | Mount Elizabeth RAWS (MOUC1), 15 mi, 2,100 ft higher — there's no official station closer | Sonora, since 1903 |
+| Reno | Reno–Tahoe airport (KRNO) | Reno, since 1893 |
+| Death Valley | Furnace Creek visitor center (DEVC1) | Death Valley, since 1911 |
 
-**Wind Compass** — A proper SVG compass dial showing real-time wind direction with a rotated arrow. Not just "SW at 8 mph" — you can *see* where it's coming from. Bill Paxton would approve.
+**Current conditions — measured.** The latest real observation from the nearest National Weather Service station, read live by the page every 5 minutes, with how old it is and where it came from. The model's value sits beside it as a check.
 
-**Barometric Pressure + Trend Arrow** — The barometer reading plus a 3-hour trend indicator. Rising? Falling fast? Steady? The arrow tells you what's coming before the clouds do. This is how storm chasers read the sky.
+**Measured, then forecast.** One chart per variable: the solid line is what the station recorded over the last 24 hours, the dashed line is the forecast for the next 48, with the 1991–2020 normal band behind them. Pressure and wind on a second chart. *It's headed right for us.*
 
-**NWS Alerts** — Live alerts pulled straight from the National Weather Service. Heat advisories in Death Valley. Wind advisories in Reno. The occasional frost warning in Groveland. They show up as color-coded banners — red for extreme, orange for severe, yellow for moderate. Click to expand the full NWS bulletin. Tabs get a colored dot when a station has active alerts so you know something's brewing before you even click over.
+**Instruments** — wind compass (the arrow points where the wind is going), barometer with the real 3-hour trend from the station's own readings, humidity and dew point with a comfort label, cloud layers and their heights, rain, UV.
 
-**Astronomy Panel** — Moon phase, illumination percentage, age in days, and countdowns to the next full and new moon. Calculated via Julian day math, no API needed. Because weather people are also sky people.
+**NWS alerts** — live, color-coded by severity, click to read the bulletin. Tabs get a dot when a station has an alert.
 
-**Air Quality** — US AQI, PM2.5, PM10, and ozone. Critical during wildfire season out west.
+**Next seven days** — model highs and lows with the normal for each date underneath and a flag when a forecast reaches the record, plus the National Weather Service's own wording.
 
-**48-Hour Hourly Forecast** — Scrollable strip with temp, precipitation probability, wind speed, and condition icons for every hour across two days.
+**From the forecaster** — the synopsis from the local NWS office's Area Forecast Discussion: what the atmosphere is doing, in a meteorologist's own words.
 
-**7-Day Forecast** — Daily cards with highs, lows, precipitation, wind, and UV index.
+**Against the record books** — the last 30 days of highs and lows against the normal range and the record high and low for every date (with the year), this month vs normal, and rain since October 1 against the water-year normal.
 
-**Sun & Daylight** — Sunrise, sunset, daylight hours, and a progress bar showing where we are in the day.
+**Air quality, sun and moon** — US AQI and what's driving it, daylight and how fast it's changing, moon phase drawn to scale.
 
-**24-Hour Trend Charts** — Temperature and barometric pressure plotted on canvas-drawn charts with gradient fills. Watch the pressure drop. Feel the front coming in. *It's headed right for us.*
+**Any US place** — type a town in the search box and the page finds the nearest NWS station, forecast office and forecast for it.
 
 ## ⚙️ HOW IT WORKS
 
-Same architecture I use for everything — the GitHub Actions pattern:
-
 ```
-GitHub Actions (cron every 15 min)
-    → fetch_weather.py (Python 3.12, stdlib only, zero deps)
-        → Open-Meteo API (weather + air quality)
-        → NWS API (active alerts)
-        → Moon phase (calculated, no API)
-    → data/weather.json
-        → index.html (static frontend, fetches JSON client-side)
-            → Your eyeballs
+Your browser, every 5 minutes                     GitHub Actions, hourly
+  ├─ NWS: latest observation + last 30 h            fetch_weather.py (stdlib only)
+  ├─ NWS: alerts, forecast, forecast discussion       ├─ data/weather.json  backup snapshot
+  ├─ Open-Meteo: hourly + 7-day forecast, AQI         └─ data/climate.json  ACIS records + 1991–2020
+  └─ data/climate.json (records & normals)                                  normals, rebuilt daily
 ```
 
-No frameworks. No npm install. No node_modules black hole. Just Python that writes JSON and HTML that reads it. The way the founders intended.
+Everything live is fetched by the page itself, so it's never older than a few minutes. If a source is down, the page falls back to the hourly backup copy and says so. The Action commits every 3 hours (or when the daily climate rebuild lands).
 
-## 🏃 RUN IT YOURSELF
-
-```bash
-pixi install
-pixi run fetch
-# open index.html
-```
-
-Or just look at the [live dashboard](https://bdgroves.github.io/weather-station) like a normal person.
+*Until October 2026 the page showed Open-Meteo's model estimate as "current conditions", from a snapshot that was often 4–7 hours old — GitHub was quietly skipping most of the every-30-minutes runs.*
 
 ## 💰 COST ANALYSIS
 
@@ -85,6 +77,7 @@ Or just look at the [live dashboard](https://bdgroves.github.io/weather-station)
 | Crawling on roof | Required | Not required |
 | Covers 4 locations simultaneously | No | Yes |
 | NWS alerts | No | Yes |
+| Records back to 1893 | No | Yes |
 | Moon phase | No | Yes |
 | Looks like a NOAA ops center | No | Yes |
 | GitHub Actions minutes | N/A | Free tier |
@@ -94,10 +87,10 @@ The math is clear.
 
 ## 📡 DATA SOURCES
 
-- **Weather & Forecasts** — [Open-Meteo API](https://open-meteo.com/) (free, no key, open source)
-- **Air Quality** — [Open-Meteo Air Quality API](https://open-meteo.com/en/docs/air-quality-api)
-- **Alerts** — [NWS API](https://www.weather.gov/documentation/services-web-api) (free, no key, taxpayer-funded)
-- **Moon Phase** — Calculated via Julian day method (been working since 45 BC, still going strong)
+- **Observations, alerts, forecasts, forecast discussions** — [NWS API](https://www.weather.gov/documentation/services-web-api) (free, no key, taxpayer-funded)
+- **Records and normals** — [ACIS](https://www.rcc-acis.org/) from NOAA's Regional Climate Centers
+- **Hourly and 7-day forecasts, air quality** — [Open-Meteo](https://open-meteo.com/) (free, no key, open source)
+- **Moon phase** — calculated in the browser
 
 ## 🎨 DESIGN
 
