@@ -281,7 +281,44 @@ async function J(url, accept, tries=1){
     finally{ clearTimeout(to); }
   }
 }
-const nws = path => J(NWS+path, 'application/geo+json', 3);
+// If the NWS can't be reached at all from this browser (a network filter, an extension, a timeout),
+// stop waiting on it for a few minutes and use the Iowa Environmental Mesonet's copy of the same reports.
+const nws = async path => {
+  if(S.nwsDownUntil && Date.now()<S.nwsDownUntil) throw new Error('NWS unreachable');
+  try{ return await J(NWS+path, 'application/geo+json', 3); }
+  catch(e){ if(!/^\d{3} /.test(e.message)) S.nwsDownUntil=Date.now()+5*60e3; throw e; }
+};
+const IEM='https://mesonet.agron.iastate.edu';
+async function T(url){ const ctl=new AbortController(), to=setTimeout(()=>ctl.abort(),20000);
+  try{ const r=await fetch(url,{signal:ctl.signal}); if(!r.ok) throw new Error(r.status+' '+url); return await r.text(); } finally{ clearTimeout(to); } }
+async function iemStations(state){
+  S.iemNet=S.iemNet||{}; if(!S.iemNet[state]) S.iemNet[state]=J(`${IEM}/geojson/network/${state}_ASOS.geojson`,null,2).catch(e=>{ delete S.iemNet[state]; throw e; });
+  return (await S.iemNet[state]).features||[];
+}
+async function iemObs(sid){
+  const flds=['tmpf','dwpf','relh','sknt','drct','gust','mslp','vsby','skyc1','skyl1','skyc2','skyl2','feel'];
+  const csv=await T(`${IEM}/cgi-bin/request/asos.py?station=${sid}&${flds.map(f=>'data='+f).join('&')}&tz=Etc/UTC&format=onlycomma&latlon=no&missing=empty&trace=empty&hours=30`);
+  const [head,...lines]=csv.trim().split('\n'); const H=head.split(',');
+  const num=x=>x===''||x==null?null:+x;
+  const series=lines.map(l=>{ const a=l.split(','), g=k=>a[H.indexOf(k)];
+    const temp=num(g('tmpf')), feel=num(g('feel'));
+    return {t:Date.parse(g('valid').replace(' ','T')+':00Z'), temp, dew:num(g('dwpf')), rh:num(g('relh')),
+      wind:g('sknt')===''?null:+g('sknt')*1.15078, gust:g('gust')===''?null:+g('gust')*1.15078, dir:num(g('drct')),
+      press:num(g('mslp')), vis:num(g('vsby')), text:'', hi:temp!=null&&feel!=null&&feel>temp?feel:null, wc:temp!=null&&feel!=null&&feel<temp?feel:null,
+      clouds:[[g('skyc1'),g('skyl1')],[g('skyc2'),g('skyl2')]].filter(c=>c[0]).map(c=>({amt:c[0],ft:num(c[1])}))}; })
+    .filter(o=>o.t).sort((a,b)=>a.t-b.t);
+  let latest=[...series].reverse().find(o=>o.temp!=null); if(!latest || Date.now()-latest.t>3*3600e3) return null;
+  const recent=[...series].reverse().filter(o=>latest.t-o.t<90*60e3);
+  for(const k of ['press','vis','dew','rh']) if(latest[k]==null){ const r=recent.find(o=>o[k]!=null); if(r) latest={...latest,[k]:r[k]}; }
+  if(!latest.clouds.length){ const r=recent.find(o=>o.clouds.length); if(r) latest={...latest,clouds:r.clouds}; }
+  return {latest, series};
+}
+async function iemAFD(office){
+  let txt=await T(`${IEM}/cgi-bin/afos/retrieve.py?pil=AFD${office}&limit=1&fmt=text`); txt=txt.replace(/^\u0001\s*/,'');
+  const m=txt.match(/\b[A-Z]{4}\d\d K?[A-Z]{3,4} (\d\d)(\d\d)(\d\d)/); let iss=null;   // WMO header: day, hour, minute (UTC)
+  if(m){ const n=new Date(); let d=new Date(Date.UTC(n.getUTCFullYear(),n.getUTCMonth(),+m[1],+m[2],+m[3])); if(d-n>2*86400e3) d=new Date(Date.UTC(n.getUTCFullYear(),n.getUTCMonth()-1,+m[1],+m[2],+m[3])); iss=d.toISOString(); }
+  return txt.includes('Area Forecast Discussion')?{productText:txt, issuanceTime:iss, issuingOffice:'K'+office, via:'IEM'}:null;
+}
 
 // station-local time helpers (all four are Pacific, but searched places may not be)
 let TZOFF = -7*3600;   // seconds, replaced by Open-Meteo's utc_offset_seconds
@@ -316,6 +353,10 @@ async function getObs(st){
       return {id, latest, series, live:true};
     }catch(e){ console.warn('obs',id,e.message); }
   }
+  for(const id of st.obs){   // NWS unreachable: the same station's reports from the Iowa Environmental Mesonet
+    const sid=st.iem?.[id] || (/^K[A-Z0-9]{3}$/.test(id)?id.slice(1):null); if(!sid) continue;
+    try{ const r=await iemObs(sid); if(r) return {id, ...r, live:true, via:'Iowa Environmental Mesonet'}; }catch(e){ console.warn('iem',id,e.message); }
+  }
   const o=S.snap?.stations?.[st.key]?.observed;   // backup copy from the hourly Action
   if(o) return {id:o.station, latest:{t:Date.parse(o.time),temp:o.temp,dew:o.dewpoint,rh:o.humidity,wind:o.wind_mph,gust:o.gust_mph,dir:o.wind_dir,press:o.pressure_hpa,vis:o.visibility_mi,text:o.text,hi:o.heat_index,wc:o.wind_chill,clouds:[]}, series:[], live:false};
   return null;
@@ -337,9 +378,10 @@ async function getForecast(st){
 async function getAQ(st){
   try{ return await J(`https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${st.lat}&longitude=${st.lon}&current=us_aqi,pm2_5,pm10,ozone,us_aqi_pm2_5,us_aqi_ozone&hourly=us_aqi&timezone=auto&forecast_days=2`); }catch(e){ return S.snap?.stations?.[st.key]?.air_quality||null; }
 }
-async function getNWSForecast(st){ try{ return (await nws(`/gridpoints/${st.office}/${st.grid[0]},${st.grid[1]}/forecast`)).properties.periods; }catch(e){ return null; } }
+async function getNWSForecast(st){ if(!st.grid) return null; try{ return (await nws(`/gridpoints/${st.office}/${st.grid[0]},${st.grid[1]}/forecast`)).properties.periods; }catch(e){ return null; } }
 async function getAFD(st){
-  try{ const list=await nws(`/products/types/AFD/locations/${st.office}`); const id=list['@graph']?.[0]?.['@id']; if(!id) return null; return await J(id,'application/ld+json'); }catch(e){ return null; }
+  try{ const list=await nws(`/products/types/AFD/locations/${st.office}`); const id=list['@graph']?.[0]?.['@id']; if(id) return await J(id,'application/ld+json',2); }catch(e){}
+  try{ return await iemAFD(st.office); }catch(e){ return null; }
 }
 async function getAlerts(st){
   try{ return (await nws(`/alerts/active?point=${st.lat},${st.lon}`)).features.map(f=>f.properties); }
@@ -423,7 +465,7 @@ function renderNow(st,c){
     <div class="place">${esc(st.name)}${st.state?', '+esc(st.state):''}<small>${st.elev!=null?st.elev.toLocaleString()+' ft':''}</small></div>
     <div class="big"><div class="temp">${r0(o.temp)}<sup>°F</sup></div><div><div class="icon">${icon(text,isDay)}</div></div></div>
     <div class="cond">${esc(text||'—')}${modelSky&&text?' <span style="font-size:.75rem;color:var(--t3)">sky from the model</span>':''}${feels?` <span style="font-size:.9rem;color:var(--t2)">· ${feels[0]} ${r0(feels[1])}°</span>`:''}</div>
-    <div class="src">${c.obs.live?'Measured':'Last backup copy'} <b>${ago(o.t)}</b> at <b>${esc(c.obs.id)}</b>${(()=>{ const i=st.obsInfo?.[c.obs.id]; return i?` · ${esc(i[0])}${i[1]?`, ${i[1]} mi away`:''}`:''; })()}</div>
+    <div class="src">${c.obs.live?'Measured':'Last backup copy'} <b>${ago(o.t)}</b> at <b>${esc(c.obs.id)}</b>${(()=>{ const i=st.obsInfo?.[c.obs.id]; return i?` · ${esc(i[0])}${i[1]?`, ${i[1]} mi away`:''}`:''; })()}${c.obs.via?` <span class="muted">· via ${esc(c.obs.via)}</span>`:''}</div>
     <div class="chips">${chips.join('')}</div>
     ${say?`<div class="say">${say}</div>`:''}`;
 }
@@ -537,7 +579,7 @@ function renderAFD(st,afd){
   const syn=grab('SYNOPSIS')||grab('KEY MESSAGES')||grab('DISCUSSION').slice(0,900)||grab('UPDATE');
   const upd=grab('UPDATE');
   const who=(txt.match(/\n\$\$\s*\n+([\s\S]*?)$/)||[])[1]?.trim().split('\n').slice(0,3).join(' · ');
-  $('afd-meta').textContent=`NWS ${afd.issuingOffice||st.office} · issued ${ago(Date.parse(afd.issuanceTime))}${who?' · '+who:''}`;
+  $('afd-meta').textContent=`NWS ${afd.issuingOffice||st.office} · ${afd.issuanceTime?'issued '+ago(Date.parse(afd.issuanceTime)):'latest issue'}${who?' · '+who:''}`;
   $('afd').innerHTML=(upd&&upd!==syn?`<b style="color:var(--amber)">Update:</b> ${esc(upd)}\n\n`:'')+esc(syn||'(no synopsis in this issue)');
   $('afd-full').textContent=txt.trim();
 }
@@ -706,7 +748,18 @@ async function addCustom(lat, lon, name, state, elev){
        const sts=(await nws(`/points/${lat.toFixed(4)},${lon.toFixed(4)}/stations`)).features.map(f=>{ const [x,y]=f.geometry.coordinates;
          return {id:f.properties.stationIdentifier, name:title(f.properties.name||''), mi:Math.round(Math.hypot((x-lon)*Math.cos(lat*Math.PI/180),(y-lat))*69)}; })
          .sort((a,b)=>a.mi-b.mi).slice(0,4);
-       st.obs=sts.map(s=>s.id); sts.forEach(s=>st.obsInfo[s.id]=[s.name,s.mi]); }catch(e){}
+       st.obs=sts.map(s=>s.id); sts.forEach(s=>st.obsInfo[s.id]=[s.name,s.mi]); }
+  catch(e){
+    // NWS unreachable: nearest airport stations and forecast office from the Iowa Environmental Mesonet's station list
+    if(/^[A-Z]{2}$/.test(state||'')) try{
+      const title=s=>/[a-z]/.test(s)?s:s.toLowerCase().replace(/\b\w/g,c=>c.toUpperCase());
+      const pre=state==='AK'?'PA':state==='HI'?'PH':'K';
+      const near=(await iemStations(state)).filter(f=>f.properties.online!==false && !f.properties.archive_end).map(f=>{ const [x,y]=f.geometry.coordinates, sid=f.properties.sid;
+          return {sid, id:sid.length===3?pre+sid:sid, name:title(f.properties.sname||''), wfo:f.properties.wfo, mi:Math.round(Math.hypot((x-lon)*Math.cos(lat*Math.PI/180),(y-lat))*69)}; })
+        .sort((a,b)=>a.mi-b.mi).slice(0,4);
+      st.obs=near.map(n=>n.id); st.iem={}; near.forEach(n=>{ st.iem[n.id]=n.sid; st.obsInfo[n.id]=[n.name,n.mi]; }); st.office=near[0]?.wfo||null;
+    }catch(e2){ console.warn('iem stations',e2.message); }
+  }
   S.custom=st; delete S.cache.custom; select('custom');
 }
 
