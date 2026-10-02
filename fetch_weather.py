@@ -142,6 +142,76 @@ def acis_val(v):
         return None
 
 
+def freeze_stats(days, thresh=32.0):
+    """First fall and last spring freeze (low at or below 32°F) for every season with a nearly complete record.
+
+    A season runs July 1 to June 30. Fall: the first freeze after July 1; spring: the last before July 1.
+    Dates are kept as days since July 1 so they average and rank across the new year.
+    Returns medians, 10th/90th percentiles, extremes with years, the share of seasons with no freeze,
+    the chance of a first freeze by each date (for the odds curve), and this season so far.
+    """
+    by = {}
+    for date, mx, mn, pc, sn in days:
+        d = dt.date.fromisoformat(date)
+        season = d.year if d.month >= 7 else d.year - 1
+        by.setdefault(season, []).append((d, mn))
+    today = dt.date.today()
+    cur = today.year if today.month >= 7 else today.year - 1
+    first, last, nofreeze = [], [], 0
+    for season, rows in sorted(by.items()):
+        if season >= cur:
+            continue
+        rep = [r for r in rows if r[1] is not None]
+        if len(rep) < 0.9 * 365:          # too many missing days to trust a first or last date
+            continue
+        start = dt.date(season, 7, 1)
+        fr = [d for d, mn in rep if mn <= thresh]
+        fall = [d for d in fr if d.month >= 7]
+        spring = [d for d in fr if d.month < 7]
+        if not fr:
+            nofreeze += 1
+            continue
+        if fall:
+            first.append(((min(fall) - start).days, season))
+        if spring:
+            last.append(((max(spring) - dt.date(season + 1, 1, 1)).days, season + 1))
+    n = len(first) + nofreeze
+    if n < 10:
+        return None
+
+    def md_from(off, base_year=2001):   # day offset from July 1 → "MM-DD"
+        return (dt.date(base_year, 7, 1) + dt.timedelta(days=off)).strftime("%m-%d")
+
+    def md_from_jan(off):
+        return (dt.date(2001, 1, 1) + dt.timedelta(days=off)).strftime("%m-%d")
+
+    def pct(vals, p):
+        v = sorted(vals)
+        return v[min(len(v) - 1, max(0, round(p * (len(v) - 1))))]
+
+    out = {"n_seasons": n, "no_freeze_pct": round(100 * nofreeze / n), "threshold": thresh}
+    if first:
+        offs = [o for o, _ in first]
+        e, l = min(first), max(first)
+        out["first"] = {"median": md_from(pct(offs, .5)), "p10": md_from(pct(offs, .1)), "p90": md_from(pct(offs, .9)),
+                        "earliest": [md_from(e[0]), e[1] + (1 if md_from(e[0]) < "07-01" else 0)], "latest": [md_from(l[0]), l[1] + (1 if md_from(l[0]) < "07-01" else 0)]}
+        # chance of at least one freeze by each week from Sept 1 to Feb 1 (share of all seasons, freezeless ones included)
+        out["odds"] = [[md_from(o), round(100 * sum(1 for x in offs if x <= o) / n)] for o in range(62, 216, 7)]
+    if last:
+        offs = [o for o, _ in last]
+        e, l = min(last), max(last)
+        out["last"] = {"median": md_from_jan(pct(offs, .5)), "p10": md_from_jan(pct(offs, .1)), "p90": md_from_jan(pct(offs, .9)),
+                       "earliest": [md_from_jan(e[0]), e[1]], "latest": [md_from_jan(l[0]), l[1]]}
+    # this season so far
+    rows = [(d, mn) for d, mn in by.get(cur, []) if mn is not None]
+    fr = [d for d, mn in rows if mn <= thresh]
+    out["this_season"] = {"first": fr[0].isoformat() if fr else None,
+                          "lowest": min(((mn, d.isoformat()) for d, mn in rows), default=(None, None))}
+    prev = [(d, mn) for d, mn in by.get(cur - 1, []) if mn is not None and d.month < 7 and mn <= thresh]
+    out["last_spring"] = max(prev)[0].isoformat() if prev else None
+    return out
+
+
 def climate(st):
     sid = st["climate"]["sid"]
     today = dt.date.today()
@@ -192,12 +262,14 @@ def climate(st):
                        "record_lo": rl[0], "record_lo_year": rl[1],
                        "normal_pcpn": round(sum(pv) / len(pv), 3) if pv else None}
 
+    freeze = freeze_stats(days)
+
     # recent daily values: last 400 days, for month-to-date and water-year-to-date
     recent = [{"date": a, "hi": b, "lo": c, "pcpn": p, "snow": s} for a, b, c, p, s in days[-400:]]
     first_year = int(rows[0][0][:4]) if rows else None
     return {"sid": sid, "label": st["climate"]["label"], "name": meta.get("name"), "elev_ft": meta.get("elev"),
             "first_year": first_year, "last_date": rows[-1][0] if rows else None,
-            "days": days_out, "recent": recent}
+            "days": days_out, "recent": recent, "freeze": freeze}
 
 
 def moon():
@@ -248,7 +320,8 @@ def main():
     cpath = os.path.join(OUT, "climate.json")
     old = json.load(open(cpath)) if os.path.exists(cpath) else {}
     labels_changed = any(old.get("stations", {}).get(st["key"], {}).get("label") != st["climate"]["label"] for st in STATIONS)
-    if old.get("built") != now.date().isoformat() or labels_changed:
+    missing_freeze = any("freeze" not in v for v in old.get("stations", {}).values())   # new field: rebuild once
+    if old.get("built") != now.date().isoformat() or labels_changed or missing_freeze:
         clim = {"built": now.date().isoformat(), "stations": {}}
         for st in STATIONS:
             try:

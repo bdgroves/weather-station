@@ -8,6 +8,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <style>
 :root{
   --bg:#0a0e17; --panel:#111827; --card:#161f31; --hover:#1f2a42; --border:#26324b; --border-hi:#374361;
@@ -101,6 +103,20 @@ canvas{max-width:100%}
 .chart{position:relative;height:260px} .chart.sm{height:150px}
 .legend{display:flex;gap:14px;flex-wrap:wrap;font:.7rem var(--fm);color:var(--t2);margin-top:8px}
 .legend i{display:inline-block;width:16px;height:3px;border-radius:2px;vertical-align:middle;margin-right:5px}
+.radar-bar{display:flex;align-items:center;gap:12px;padding:10px 14px;border-top:1px solid var(--border);font:.75rem var(--fm);color:var(--t2)}
+.radar-bar button{background:var(--hover);border:1px solid var(--border);color:var(--amber);border-radius:6px;width:34px;height:28px;cursor:pointer;font-size:.7rem}
+.radar-bar input{flex:1;accent-color:var(--amber)}
+#r-time{min-width:150px;text-align:right}
+#radar{position:relative;z-index:0}   /* keep Leaflet's own z-indexes under the sticky header */
+.leaflet-container{background:#0a0e17;font:.7rem var(--fb)}
+.leaflet-control-attribution{background:rgba(10,14,23,.75)!important;color:#7d8aa5!important}.leaflet-control-attribution a{color:#9aa6bf!important}
+.leaflet-bar a{background:var(--panel)!important;color:var(--t1)!important;border-color:var(--border)!important}
+.fzbar{position:relative;height:10px;border-radius:5px;background:var(--bg);border:1px solid var(--border);margin:10px 0 4px}
+.fzbar i{position:absolute;top:0;bottom:0;background:rgba(77,166,255,.35);border-radius:4px}
+.fzbar b{position:absolute;top:-4px;bottom:-4px;width:2px;background:#4da6ff}
+.fzbar em{position:absolute;top:-6px;bottom:-6px;width:2px;background:var(--amber)}
+.fzax{position:relative;height:14px;font:.62rem var(--fm);color:var(--t3)}
+.fzax span{position:absolute;transform:translateX(-50%)}
 .seg{display:inline-flex;gap:2px;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:2px}
 .seg button{background:none;border:0;color:var(--t3);font:500 .65rem var(--fm);letter-spacing:.1em;text-transform:uppercase;padding:3px 8px;border-radius:4px;cursor:pointer}
 .seg button.on{background:var(--hover);color:var(--amber)}
@@ -203,6 +219,14 @@ footer b{color:var(--t2);font-weight:500}
     </div>
   </section>
 
+  <section class="sec" id="radar-sec">
+    <div class="sec-h"><h2>Radar, the last hour</h2><p>The National Weather Service's NEXRAD radars stitched into one picture every five minutes, from the Iowa Environmental Mesonet. Brighter colours are heavier rain or snow.</p></div>
+    <div class="card" style="padding:0;overflow:hidden">
+      <div id="radar" style="height:380px;background:#0a0e17"></div>
+      <div class="radar-bar"><button id="r-play" aria-label="Pause">❚❚</button><input id="r-slide" type="range" min="0" max="11" value="11" aria-label="Radar time"><span id="r-time">—</span></div>
+    </div>
+  </section>
+
   <section class="sec">
     <div class="sec-h"><h2>Next seven days</h2><p>Model forecast (Open-Meteo), with the 1991–2020 normal for each date underneath, and the National Weather Service's own wording.</p></div>
     <div class="days" id="days"></div>
@@ -235,9 +259,10 @@ footer b{color:var(--t2);font-weight:500}
         <div class="legend"><span><i style="background:#ef6868"></i>daily high</span><span><i style="background:#4da6ff"></i>daily low</span><span><i style="background:rgba(154,166,191,.35);height:8px"></i>normal range</span><span><i style="background:repeating-linear-gradient(90deg,#ef6868 0 3px,transparent 3px 6px)"></i>record high</span><span><i style="background:repeating-linear-gradient(90deg,#4da6ff 0 3px,transparent 3px 6px)"></i>record low</span></div></div>
       <div class="card"><h3>On this date</h3><div id="otd"></div></div>
     </div>
-    <div class="g2" style="margin-top:14px">
+    <div class="g3" style="margin-top:14px">
       <div class="card"><h3>This month so far</h3><div id="month"></div></div>
       <div class="card"><h3>Rain since October 1 <em>water year</em></h3><div id="wy"></div></div>
+      <div class="card"><h3>First freeze <em id="fz-sub"></em></h3><div id="freeze"></div></div>
     </div>
   </section>
 
@@ -486,6 +511,36 @@ async function getClimate(st){
   }
   return best?.cl||null;
 }
+function freezeStats(daily, thresh=32){
+  // daily: [[date, low]]. Seasons run July 1 to June 30; dates kept as days since July 1 (fall) or Jan 1 (spring).
+  const by={}; for(const [date,lo] of daily){ const y=+date.slice(0,4), m=+date.slice(5,7), s=m>=7?y:y-1; (by[s]=by[s]||[]).push([date,lo]); }
+  const now=new Date(), cur=now.getUTCMonth()>=6?now.getUTCFullYear():now.getUTCFullYear()-1;
+  const dayN=(a,b)=>Math.round((Date.parse(a+'T00:00:00Z')-Date.parse(b+'T00:00:00Z'))/86400e3);
+  const first=[], last=[]; let none=0;
+  for(const [sk,rows] of Object.entries(by)){ const s=+sk; if(s>=cur) continue;
+    const rep=rows.filter(r=>r[1]!=null); if(rep.length<0.9*365) continue;
+    const fr=rep.filter(r=>r[1]<=thresh).map(r=>r[0]); if(!fr.length){ none++; continue; }
+    const fall=fr.filter(d=>+d.slice(5,7)>=7), spring=fr.filter(d=>+d.slice(5,7)<7);
+    if(fall.length) first.push([dayN(fall.sort()[0],`${s}-07-01`), s]);
+    if(spring.length) last.push([dayN(spring.sort().at(-1),`${s+1}-01-01`), s+1]); }
+  const n=first.length+none; if(n<10) return null;
+  const md=(off,base)=>new Date(Date.parse(base)+off*86400e3).toISOString().slice(5,10);
+  const fromJul=o=>md(o,'2001-07-01T00:00:00Z'), fromJan=o=>md(o,'2001-01-01T00:00:00Z');
+  const pct=(v,p)=>{ const a=[...v].sort((x,y)=>x-y); return a[Math.min(a.length-1,Math.max(0,Math.round(p*(a.length-1))))]; };
+  const out={n_seasons:n, no_freeze_pct:Math.round(100*none/n), threshold:thresh};
+  if(first.length){ const o=first.map(x=>x[0]), e=first.reduce((a,b)=>b[0]<a[0]?b:a), l=first.reduce((a,b)=>b[0]>a[0]?b:a);
+    const yr=(x)=>x[1]+(fromJul(x[0])<'07-01'?1:0);
+    out.first={median:fromJul(pct(o,.5)), p10:fromJul(pct(o,.1)), p90:fromJul(pct(o,.9)), earliest:[fromJul(e[0]),yr(e)], latest:[fromJul(l[0]),yr(l)]};
+    out.odds=[]; for(let k=62;k<216;k+=7) out.odds.push([fromJul(k), Math.round(100*o.filter(x=>x<=k).length/n)]); }
+  if(last.length){ const o=last.map(x=>x[0]), e=last.reduce((a,b)=>b[0]<a[0]?b:a), l=last.reduce((a,b)=>b[0]>a[0]?b:a);
+    out.last={median:fromJan(pct(o,.5)), p10:fromJan(pct(o,.1)), p90:fromJan(pct(o,.9)), earliest:[fromJan(e[0]),e[1]], latest:[fromJan(l[0]),l[1]]}; }
+  const cr=(by[cur]||[]).filter(r=>r[1]!=null), cf=cr.filter(r=>r[1]<=thresh);
+  const low=cr.reduce((a,r)=>a==null||r[1]<a[0]?[r[1],r[0]]:a,null);
+  out.this_season={first:cf[0]?.[0]||null, lowest:low||[null,null]};
+  const ps=(by[cur-1]||[]).filter(r=>r[1]!=null&&+r[0].slice(5,7)<7&&r[1]<=thresh).map(r=>r[0]).sort();
+  out.last_spring=ps.at(-1)||null;
+  return out;
+}
 function buildClim(c, rows, today, older=[]){
   if(!rows.length) return null;
   // older stations' days first, so the current station wins any date both cover
@@ -513,7 +568,8 @@ function buildClim(c, rows, today, older=[]){
   const nm=title(c.name||''), first=olderRows.length?olderRows.reduce((m,r)=>r[0]<m?r[0]:m,rows[0][0]):rows[0][0];
   const joined=older.length?`, with earlier records from ${older.map(o=>title(o.h.name)).join(' and ')}`:'';
   return {label:`${nm}${c.mi>=1?` (${Math.round(c.mi)} mi away)`:''}${joined}`, name:'', elev_ft:c.elev, first_year:+first.slice(0,4),
-          last_date:[...days].reverse().find(x=>x.hi!=null)?.date||rows[rows.length-1][0], days:out, recent:days.slice(-400), built:today};
+          last_date:[...days].reverse().find(x=>x.hi!=null)?.date||rows[rows.length-1][0], days:out, recent:days.slice(-400), built:today,
+          freeze:freezeStats(olderRows.concat(rows).map(r=>[r[0],acisVal(r[2])]).sort((a,b)=>a[0]<b[0]?-1:1))};
 }
 function clDay(st, md){ return climFor(st)?.days?.[md]||null; }
 
@@ -521,7 +577,7 @@ function render(st){
   const c=S.cache[st.key]; if(!c) return;
   if(c.fc?.utc_offset_seconds!=null) TZOFF=c.fc.utc_offset_seconds;
   renderTabs(); renderAlerts(c.alerts); renderNow(st,c); renderInstruments(st,c); renderCharts(st,c); renderDays(st,c); renderNWS(c.periods); renderAFD(st,c.afd);
-  renderClimate(st); renderVerify(st); renderAQ(c.aq); renderSun(c.fc); renderMoon(); renderFresh(st,c);
+  renderClimate(st); renderVerify(st); radarCenter(st); renderAQ(c.aq); renderSun(c.fc); renderMoon(); renderFresh(st,c);
   document.title=`${r0(c.obs?.latest?.temp)}° ${st.name} — Weather Station`;
 }
 
@@ -685,6 +741,45 @@ function renderDays(st,c){
       <div class="pp">💧 ${r0(d.precipitation_probability_max[i])}%${d.precipitation_sum[i]>=0.01?` · ${d.precipitation_sum[i].toFixed(2)}"`:''}</div>
       <div class="wd">💨 ${r0(d.wind_speed_10m_max[i])}${d.wind_gusts_10m_max[i]>=d.wind_speed_10m_max[i]+5?`–${r0(d.wind_gusts_10m_max[i])}`:''} mph</div></div>`; }).join('');
 }
+// ── radar: NEXRAD composite tiles from the Iowa Environmental Mesonet, now and every 5 minutes back to 55 minutes ago
+const R={map:null, layers:[], i:11, timer:null, valid:null, marker:null};
+function radarInit(){
+  if(R.map || typeof L==='undefined' || !$('radar')) return;
+  R.map=L.map('radar',{zoomControl:true,attributionControl:true,scrollWheelZoom:false}).setView([S.cur?.lat||40,S.cur?.lon||-100],7);
+  R.map.attributionControl.setPrefix('<a href="https://leafletjs.com">Leaflet</a>');
+  R.map.createPane('labels'); R.map.getPane('labels').style.zIndex=650; R.map.getPane('labels').style.pointerEvents='none';
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png',{maxZoom:10,minZoom:4,attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> © <a href="https://carto.com/">CARTO</a>'}).addTo(R.map);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png',{maxZoom:10,minZoom:4,pane:'labels'}).addTo(R.map);
+  radarLayers(); radarPlay(true); radarCenter(S.cur);
+  setInterval(()=>{ if(document.visibilityState==='visible') radarLayers(); },5*60e3);
+}
+async function radarLayers(){
+  try{ R.valid=Date.parse((JSON.parse(await T(`${IEM}/data/gis/images/4326/USCOMP/n0q_0.json`))).meta.valid); }catch(e){ R.valid=Math.floor(Date.now()/300e3)*300e3; }
+  R.layers.forEach(l=>R.map.removeLayer(l));
+  R.layers=[]; for(let k=11;k>=0;k--){   // oldest first: index 0 is 55 minutes ago, 11 is the latest
+    const name=k?`nexrad-n0q-900913-m${String(k*5).padStart(2,'0')}m`:'nexrad-n0q-900913';
+    R.layers.push(L.tileLayer(`${IEM}/cache/tile.py/1.0.0/${name}/{z}/{x}/{y}.png?v=${R.valid}`,{opacity:0,maxZoom:10,minZoom:4,
+      attribution:k?'':'Radar: NWS NEXRAD via <a href="https://mesonet.agron.iastate.edu/">Iowa Environmental Mesonet</a>'}).addTo(R.map)); }
+  radarShow(R.i);
+}
+function radarShow(i){
+  R.i=i; R.layers.forEach((l,k)=>l.setOpacity(k===i?.75:0)); $('r-slide').value=i;
+  const t=R.valid-(11-i)*300e3; $('r-time').textContent=`${new Date(t).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})}${i===11?' · latest':` · ${(11-i)*5} min ago`}`;
+}
+function radarPlay(on){
+  clearTimeout(R.timer); R.timer=null; $('r-play').textContent=on?'❚❚':'▶'; $('r-play').setAttribute('aria-label',on?'Pause':'Play');
+  if(on){ const step=()=>{ radarShow(R.i>=11?0:R.i+1); R.timer=setTimeout(step, R.i===11?1600:450); }; R.timer=setTimeout(step,450); }
+}
+function radarCenter(st){
+  if(!R.map||!st||R.stKey===st.key+st.lat) return; R.stKey=st.key+st.lat; R.map.setView([st.lat,st.lon],7);
+  if(R.marker) R.map.removeLayer(R.marker);
+  R.marker=L.circleMarker([st.lat,st.lon],{radius:6,color:'#f5a623',weight:2,fillColor:'#f5a623',fillOpacity:.35}).addTo(R.map).bindTooltip(st.name);
+}
+$('r-play').onclick=()=>radarPlay(!R.timer);
+$('r-slide').oninput=e=>{ radarPlay(false); radarShow(+e.target.value); };
+// start the map only when it scrolls into view (saves tiles for people who never look)
+if('IntersectionObserver' in window){ new IntersectionObserver((es,o)=>{ if(es.some(e=>e.isIntersecting)){ radarInit(); o.disconnect(); } },{rootMargin:'200px'}).observe($('radar')); } else setTimeout(radarInit,3000);
+
 // ── forecast scoring (data/verify.json, built daily by verify.py) ─────────────
 S.vKind='hi';
 function renderVerify(st){
@@ -736,8 +831,26 @@ function renderAFD(st,afd){
   $('afd').innerHTML=(upd&&upd!==syn?`<b style="color:var(--amber)">Update:</b> ${esc(upd)}\n\n`:'')+esc(syn||'(no synopsis in this issue)');
   $('afd-full').textContent=txt.trim();
 }
+function renderFreeze(st, cl){
+  const F=cl?.freeze, box=$('freeze'); $('fz-sub').textContent='';
+  if(!cl){ box.innerHTML='<div class="note">—</div>'; return; }
+  if(!F||!F.first){ box.innerHTML=`<div class="note">${F&&F.no_freeze_pct>=90?`It hasn’t dropped to 32° in ${F.no_freeze_pct}% of winters here.`:'Not enough complete winters in the record to say.'}</div>`; return; }
+  const fmt=md=>new Date(`2001-${md}T12:00:00Z`).toLocaleDateString('en-US',{month:'short',day:'numeric',timeZone:'UTC'});
+  const todayMD=localMD(Date.now()), off=md=>{ let d=(Date.parse(`2001-${md}T00:00:00Z`)-Date.parse('2001-07-01T00:00:00Z'))/86400e3; if(d<0) d+=365; return d; };
+  const lo=62, hi=215, X=md=>Math.max(0,Math.min(100,100*(off(md)-lo)/(hi-lo)));   // Sept 1 to Feb 1
+  const byNow=(F.odds||[]).filter(o=>off(o[0])<=off(todayMD)).at(-1)?.[1]??0;
+  const ts=F.this_season||{}, fc=S.cache[st.key]?.fc?.daily;
+  let soon=''; if(fc){ const i=fc.temperature_2m_min.findIndex(x=>x!=null&&x<=34); if(i>=0){ const d=fc.time[i]; soon=`<div class="note" style="color:#4da6ff;margin-top:6px">The forecast has a low of <b>${r0(fc.temperature_2m_min[i])}°</b> on ${new Date(d+'T12:00:00Z').toLocaleDateString('en-US',{weekday:'long',timeZone:'UTC'})}.</div>`; } }
+  $('fz-sub').textContent=`${F.n_seasons} winters`;
+  box.innerHTML=`<div style="font:500 1.9rem var(--fd)">${fmt(F.first.median)}<span style="font-size:1rem;color:var(--t2)"> typical</span></div>
+    <div class="fzbar"><i style="left:${X(F.first.p10)}%;width:${X(F.first.p90)-X(F.first.p10)}%"></i><b style="left:${X(F.first.median)}%"></b><em style="left:${X(todayMD)}%" title="today"></em></div>
+    <div class="fzax">${['09-01','10-01','11-01','12-01','01-01','02-01'].map(m=>`<span style="left:${X(m)}%">${fmt(m).split(' ')[0]}</span>`).join('')}</div>
+    <div class="note" style="margin-top:8px">The first 32° night comes between ${fmt(F.first.p10)} and ${fmt(F.first.p90)} in 8 winters out of 10 (blue band; amber is today). Earliest ${fmt(F.first.earliest[0])} ${F.first.earliest[1]}, latest ${fmt(F.first.latest[0])} ${F.first.latest[1]}${F.no_freeze_pct?`; no freeze at all in ${F.no_freeze_pct}% of winters`:''}.
+    <b style="color:var(--t1)">${ts.first?`This season’s first came on ${new Date(ts.first+'T12:00:00Z').toLocaleDateString('en-US',{month:'short',day:'numeric',timeZone:'UTC'})}.`:`${byNow}% of winters have had one by now; none yet this season${ts.lowest?.[0]!=null?` (coldest so far ${r0(ts.lowest[0])}°)`:''}.`}</b>
+    ${F.last?` Last spring freeze: typically ${fmt(F.last.median)}${F.last_spring?`; this year ${new Date(F.last_spring+'T12:00:00Z').toLocaleDateString('en-US',{month:'short',day:'numeric',timeZone:'UTC'})}`:''}.`:''}</div>${soon}`;
+}
 function renderClimate(st){
-  const cl=climFor(st);
+  const cl=climFor(st); renderFreeze(st, cl);
   if(!cl){ $('clim-intro').textContent=st.custom&&!st.climDone?'Looking up the records for the nearest long-running weather station…':st.custom&&st.climErr?'Couldn’t reach the climate database (ACIS) just now.':st.custom?'No long-running weather station with daily records was found within 30 miles of this place.':'Records and normals are unavailable right now.'; ['otd','month','wy'].forEach(id=>$(id).innerHTML='<div class="note">—</div>'); mk('climChart',{type:'line',data:{datasets:[]}}); $('c-sub').textContent=''; return; }
   $('clim-intro').innerHTML=`Daily records from <b>${esc(cl.label)}</b>${cl.name&&!cl.label.toLowerCase().startsWith(cl.name.toLowerCase())?', '+esc(cl.name):''} — kept since ${cl.first_year}. Normals are the 1991–2020 average, smoothed over two weeks.`;
   const rec=cl.recent.slice(-31);
