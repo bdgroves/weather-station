@@ -416,9 +416,10 @@ async function getClimate(st){
   const m=await J(`${ACIS}/StnMeta?bbox=${(st.lon-d).toFixed(2)},${(st.lat-d).toFixed(2)},${(st.lon+d).toFixed(2)},${(st.lat+d).toFixed(2)}&elems=maxt,mint,pcpn&meta=name,uid,ll,elev,valid_daterange`,null,2);
   const all=(m.meta||[]).filter(x=>x.ll&&(x.valid_daterange||[])[0]?.length).map(x=>{ const r=x.valid_daterange;
     return {...x, start:r[0][0], end:r[0][1], pend:r[2]?.[1]||'', mi:Math.hypot((x.ll[0]-st.lon)*Math.cos(st.lat*Math.PI/180),x.ll[1]-st.lat)*69}; });
-  // current stations that report both temperature and rain, within 30 miles: ones covering 1991–2020 first, then the longest, then the nearest
+  // current stations that report both temperature and rain, within 30 miles
   const cands=all.filter(x=>x.end>=soon && x.pend>=soon && x.mi<=30)
-    .sort((a,b)=>((a.start<='1991-01-01')===(b.start<='1991-01-01')?0:(a.start<='1991-01-01'?-1:1)) || a.start.localeCompare(b.start) || a.mi-b.mi);
+    .sort((a,b)=>{ const t=x=>x.start<='1991-01-01'?0:1, n=x=>x.mi<=10?0:1;   // covers the normals, then within 10 miles, then the longest, then the nearest
+      return t(a)-t(b) || n(a)-n(b) || a.start.localeCompare(b.start) || a.mi-b.mi; });
   if(!cands.length) return null;
   let best=null;
   for(const c of cands.slice(0,3)){
