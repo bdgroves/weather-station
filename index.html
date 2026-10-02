@@ -413,33 +413,41 @@ const ACIS='https://data.rcc-acis.org';
 function acisVal(v){ if(v==null||v==='M'||v==='S'||v==='') return null; if(v==='T') return 0; const x=parseFloat(String(v).replace(/[ASTa]$/,'')); return Number.isNaN(x)?null:x; }
 async function getClimate(st){
   const d=0.45, today=new Date().toISOString().slice(0,10), soon=new Date(Date.now()-120*86400e3).toISOString().slice(0,10);   // co-op reports can lag weeks
-  const m=await J(`${ACIS}/StnMeta?bbox=${(st.lon-d).toFixed(2)},${(st.lat-d).toFixed(2)},${(st.lon+d).toFixed(2)},${(st.lat+d).toFixed(2)}&elems=maxt,mint&meta=name,uid,ll,elev,valid_daterange`,null,2);
-  const cands=(m.meta||[]).map(x=>{ const [a,b]=(x.valid_daterange||[])[0]||[]; return {...x, start:a, end:b,
-      mi:Math.hypot((x.ll[0]-st.lon)*Math.cos(st.lat*Math.PI/180),x.ll[1]-st.lat)*69}; })
-    .filter(x=>x.start && x.end>=soon && x.mi<=30);
+  const m=await J(`${ACIS}/StnMeta?bbox=${(st.lon-d).toFixed(2)},${(st.lat-d).toFixed(2)},${(st.lon+d).toFixed(2)},${(st.lat+d).toFixed(2)}&elems=maxt,mint,pcpn&meta=name,uid,ll,elev,valid_daterange`,null,2);
+  const all=(m.meta||[]).filter(x=>x.ll&&(x.valid_daterange||[])[0]?.length).map(x=>{ const r=x.valid_daterange;
+    return {...x, start:r[0][0], end:r[0][1], pend:r[2]?.[1]||'', mi:Math.hypot((x.ll[0]-st.lon)*Math.cos(st.lat*Math.PI/180),x.ll[1]-st.lat)*69}; });
+  // current stations that report both temperature and rain, within 30 miles: ones covering 1991–2020 first, then the longest, then the nearest
+  const cands=all.filter(x=>x.end>=soon && x.pend>=soon && x.mi<=30)
+    .sort((a,b)=>((a.start<='1991-01-01')===(b.start<='1991-01-01')?0:(a.start<='1991-01-01'?-1:1)) || a.start.localeCompare(b.start) || a.mi-b.mi);
   if(!cands.length) return null;
-  // the longest record that covers the 1991–2020 normals period, nearer breaking ties
-  cands.sort((a,b)=>((a.start<='1991-01-01')===(b.start<='1991-01-01')?0:(a.start<='1991-01-01'?-1:1)) || a.start.localeCompare(b.start) || a.mi-b.mi);
-  // a long record can still have no 1991–2020 data: try up to three, keep the first with normals for most of the year
   let best=null;
   for(const c of cands.slice(0,3)){
     const r=await J(`${ACIS}/StnData?uid=${c.uid}&sdate=por&edate=${today}&elems=maxt,mint,pcpn&meta=name`,null,2);
-    const cl=buildClim(c, r.data||[], today); if(!cl) continue;
+    const rows=r.data||[]; if(!rows.length) continue;
+    // older stations in the same town (within 6 miles) whose records start earlier: their history joins the records, as NOAA's threaded records do
+    const hist=all.filter(x=>x.uid!==c.uid && x.start<c.start && Math.hypot((x.ll[0]-c.ll[0])*Math.cos(st.lat*Math.PI/180),x.ll[1]-c.ll[1])*69<=6)
+      .sort((a,b)=>a.start.localeCompare(b.start)).slice(0,2);
+    const older=[];
+    for(const h of hist){ try{ const hr=await J(`${ACIS}/StnData?uid=${h.uid}&sdate=por&edate=${c.start}&elems=maxt,mint&meta=name`,null,2); if((hr.data||[]).length) older.push({h, rows:hr.data}); }catch(e){} }
+    const cl=buildClim(c, rows, today, older); if(!cl) continue;
     const cover=Object.values(cl.days).filter(x=>x.normal_hi!=null).length/366;
     if(!best || cover>best.cover) best={cl,cover};
     if(cover>=0.8) break;
   }
   return best?.cl||null;
 }
-function buildClim(c, rows, today){
+function buildClim(c, rows, today, older=[]){
   if(!rows.length) return null;
+  // older stations' days first, so the current station wins any date both cover
+  const own=new Set(rows.map(r=>r[0])), olderRows=[];
+  const seen=new Set(own); for(const o of older) for(const [date,a,b] of o.rows) if(!seen.has(date)){ seen.add(date); olderRows.push([date,a,b,'M']); }
   const by={}, keys=[];
   for(let mo=1;mo<=12;mo++) for(let dd=1;dd<=31;dd++){ if([4,6,9,11].includes(mo)&&dd===31) continue; if(mo===2&&dd>29) continue; keys.push(`${String(mo).padStart(2,'0')}-${String(dd).padStart(2,'0')}`); }
   const days=[];
-  for(const [date,a,b,p] of rows){ const md=date.slice(5), y=+date.slice(0,4), mx=acisVal(a), mn=acisVal(b), pc=acisVal(p);
+  for(const [date,a,b,p] of olderRows.concat(rows)){ const md=date.slice(5), y=+date.slice(0,4), mx=acisVal(a), mn=acisVal(b), pc=acisVal(p);
     const e=by[md]||(by[md]={hi:[],lo:[],pcpn:[]});
     if(mx!=null) e.hi.push([mx,y]); if(mn!=null) e.lo.push([mn,y]); if(pc!=null&&y>=1991&&y<=2020) e.pcpn.push(pc);
-    days.push({date, hi:mx, lo:mn, pcpn:pc}); }
+    if(own.has(date)) days.push({date, hi:mx, lo:mn, pcpn:pc}); }
   const win=(i,f)=>{ const v=[]; for(let k=i-7;k<=i+7;k++) for(const [x,y] of (by[keys[(k+keys.length)%keys.length]]?.[f]||[])) if(f==='pcpn'||(y>=1991&&y<=2020)) v.push(f==='pcpn'?x:x); return v; };
   const winP=i=>{ const v=[]; for(let k=i-7;k<=i+7;k++) v.push(...(by[keys[(k+keys.length)%keys.length]]?.pcpn||[])); return v; };
   const avg=a=>a.length?Math.round(a.reduce((s,x)=>s+x,0)/a.length*10)/10:null;
@@ -450,8 +458,9 @@ function buildClim(c, rows, today){
     out[k]={normal_hi:avg(win(i,'hi')), normal_lo:avg(win(i,'lo')), record_hi:rh[0], record_hi_year:rh[1], record_lo:rl[0], record_lo_year:rl[1],
             normal_pcpn:pv.length?Math.round(pv.reduce((s,x)=>s+x,0)/pv.length*1000)/1000:null}; });
   const title=s=>/[a-z]/.test(s)?s:s.toLowerCase().replace(/\b\w/g,x=>x.toUpperCase());
-  const nm=title(c.name||'');
-  return {label:`${nm}${c.mi>=1?` (${Math.round(c.mi)} mi away)`:''}`, name:'', elev_ft:c.elev, first_year:+rows[0][0].slice(0,4),
+  const nm=title(c.name||''), first=olderRows.length?olderRows.reduce((m,r)=>r[0]<m?r[0]:m,rows[0][0]):rows[0][0];
+  const joined=older.length?`, with earlier records from ${older.map(o=>title(o.h.name)).join(' and ')}`:'';
+  return {label:`${nm}${c.mi>=1?` (${Math.round(c.mi)} mi away)`:''}${joined}`, name:'', elev_ft:c.elev, first_year:+first.slice(0,4),
           last_date:[...days].reverse().find(x=>x.hi!=null)?.date||rows[rows.length-1][0], days:out, recent:days.slice(-400), built:today};
 }
 function clDay(st, md){ return climFor(st)?.days?.[md]||null; }
