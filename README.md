@@ -50,9 +50,9 @@ This isn't your phone's weather app. This is the whole instrument panel — and 
 
 **Air quality, sun and moon** — US AQI and what's driving it, daylight and how fast it's changing, moon phase drawn to scale.
 
-**Any US place** — type a town ("Bend", "Sonora, CA") or a ZIP, pick from the suggestions, and the page finds the nearest NWS stations, forecast office and forecast for it, with its own link. Searched places get record books too: the page finds the nearest current ACIS station with temperature and rain, joins in older stations from the same town (Lawton since 1912, Moab since 1893), and builds normals and records in the browser.
+**Any US place** — type a town ("Bend", "Sonora, CA") or a ZIP, pick from the suggestions, and the page finds the nearest NWS stations, forecast office and forecast for it, with its own link. Searched places get record books too: the page finds the nearest current ACIS station with temperature and rain, uses NOAA's official threaded record when there is one nearby (Lawton since 1912, Boise since 1875) or otherwise joins in older stations from the same town (Moab since 1893), and builds normals and records in the browser.
 
-**When the NWS can't be reached** from a visitor's browser, the page reads the same station reports and forecast discussions from the [Iowa Environmental Mesonet](https://mesonet.agron.iastate.edu/) and says so beside the reading.
+**When the NWS can't be reached** from a visitor's browser, the page reads the same station reports, forecast discussions and active alerts from the [Iowa Environmental Mesonet](https://mesonet.agron.iastate.edu/) and says so beside the reading.
 
 ## ⚙️ HOW IT WORKS
 
