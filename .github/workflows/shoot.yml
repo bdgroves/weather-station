@@ -5,6 +5,9 @@ on:
       script:
         description: script to run
         default: tools/shoot.mjs
+      browser:
+        description: chromium, webkit or firefox
+        default: chromium
       queries:
         description: place searches for search_test, separated by |
         default: ''
@@ -17,8 +20,8 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with: { node-version: '20' }
-      - run: npm i playwright@1.47 && npx playwright install --with-deps chromium
-      - run: mkdir -p tools/shots && QS="${{ inputs.queries }}" node ${{ inputs.script || 'tools/shoot.mjs' }}
+      - run: npm i playwright@1.47 && npx playwright install --with-deps ${{ inputs.browser || 'chromium' }}
+      - run: mkdir -p tools/shots && BROWSER="${{ inputs.browser || 'chromium' }}" QS="${{ inputs.queries }}" node ${{ inputs.script || 'tools/shoot.mjs' }}
       - name: Publish to the shots branch (keeps main clean)
         run: |
           git config user.name "github-actions[bot]"
