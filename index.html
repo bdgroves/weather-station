@@ -748,8 +748,9 @@ function radarInit(){
   R.map=L.map('radar',{zoomControl:true,attributionControl:true,scrollWheelZoom:false}).setView([S.cur?.lat||40,S.cur?.lon||-100],7);
   R.map.attributionControl.setPrefix('<a href="https://leafletjs.com">Leaflet</a>');
   R.map.createPane('labels'); R.map.getPane('labels').style.zIndex=650; R.map.getPane('labels').style.pointerEvents='none';
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png',{maxZoom:10,minZoom:4,attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> © <a href="https://carto.com/">CARTO</a>'}).addTo(R.map);
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png',{maxZoom:10,minZoom:4,pane:'labels'}).addTo(R.map);
+  // Esri's dark gray canvas (no key; CARTO's free basemaps now ask for one from other sites), as on AFTERSHOCK
+  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',{maxZoom:10,minZoom:4,attribution:'Esri, HERE, Garmin, © OpenStreetMap'}).addTo(R.map);
+  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}',{maxZoom:10,minZoom:4,opacity:.8,pane:'labels'}).addTo(R.map);
   radarLayers(); radarPlay(true); radarCenter(S.cur);
   setInterval(()=>{ if(document.visibilityState==='visible') radarLayers(); },5*60e3);
 }
@@ -846,7 +847,7 @@ function renderFreeze(st, cl){
     <div class="fzbar"><i style="left:${X(F.first.p10)}%;width:${X(F.first.p90)-X(F.first.p10)}%"></i><b style="left:${X(F.first.median)}%"></b><em style="left:${X(todayMD)}%" title="today"></em></div>
     <div class="fzax">${['09-01','10-01','11-01','12-01','01-01','02-01'].map(m=>`<span style="left:${X(m)}%">${fmt(m).split(' ')[0]}</span>`).join('')}</div>
     <div class="note" style="margin-top:8px">The first 32° night comes between ${fmt(F.first.p10)} and ${fmt(F.first.p90)} in 8 winters out of 10 (blue band; amber is today). Earliest ${fmt(F.first.earliest[0])} ${F.first.earliest[1]}, latest ${fmt(F.first.latest[0])} ${F.first.latest[1]}${F.no_freeze_pct?`; no freeze at all in ${F.no_freeze_pct}% of winters`:''}.
-    <b style="color:var(--t1)">${ts.first?`This season’s first came on ${new Date(ts.first+'T12:00:00Z').toLocaleDateString('en-US',{month:'short',day:'numeric',timeZone:'UTC'})}.`:`${byNow}% of winters have had one by now; none yet this season${ts.lowest?.[0]!=null?` (coldest so far ${r0(ts.lowest[0])}°)`:''}.`}</b>
+    <b style="color:var(--t1)">${ts.first?`This season’s first came on ${new Date(ts.first+'T12:00:00Z').toLocaleDateString('en-US',{month:'short',day:'numeric',timeZone:'UTC'})}.`:`${byNow?`${byNow}% of winters have had one by now`:'No winter on record has had one this early'}; none yet this season${ts.lowest?.[0]!=null?` (coldest so far ${r0(ts.lowest[0])}°)`:''}.`}</b>
     ${F.last?` Last spring freeze: typically ${fmt(F.last.median)}${F.last_spring?`; this year ${new Date(F.last_spring+'T12:00:00Z').toLocaleDateString('en-US',{month:'short',day:'numeric',timeZone:'UTC'})}`:''}.`:''}</div>${soon}`;
 }
 function renderClimate(st){
