@@ -80,17 +80,20 @@ def c2f(c):
 def latest_obs(st):
     for sid in st["obs"]:
         try:
-            p = get(f"https://api.weather.gov/stations/{sid}/observations/latest")["properties"]
-            v = lambda k: (p.get(k) or {}).get("value")
-            if v("temperature") is None and v("windSpeed") is None:
+            # the newest report can be partial (no temperature), so take the newest complete one of the last few
+            feats = get(f"https://api.weather.gov/stations/{sid}/observations?limit=6")["features"]
+            full = [f["properties"] for f in feats if (f["properties"].get("temperature") or {}).get("value") is not None]
+            if not full:
                 continue
+            p = full[0]
+            v = lambda k: (p.get(k) or {}).get("value")
             return {"station": sid, "name": p.get("stationName"), "time": p.get("timestamp"),
                     "text": p.get("textDescription") or None, "temp": c2f(v("temperature")),
                     "dewpoint": c2f(v("dewpoint")), "humidity": round(v("relativeHumidity")) if v("relativeHumidity") is not None else None,
                     "wind_mph": round(v("windSpeed") / 1.609, 1) if v("windSpeed") is not None else None,
                     "gust_mph": round(v("windGust") / 1.609, 1) if v("windGust") is not None else None,
                     "wind_dir": v("windDirection"),
-                    "pressure_hpa": round(v("barometricPressure") / 100, 1) if v("barometricPressure") else None,
+                    "pressure_hpa": round((v("seaLevelPressure") or v("barometricPressure")) / 100, 1) if (v("seaLevelPressure") or v("barometricPressure")) else None,
                     "visibility_mi": round(v("visibility") / 1609.34, 1) if v("visibility") is not None else None,
                     "heat_index": c2f(v("heatIndex")), "wind_chill": c2f(v("windChill"))}
         except Exception as e:
