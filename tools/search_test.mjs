@@ -3,7 +3,8 @@ import { chromium } from 'playwright';
 import fs from 'fs';
 const b = await chromium.launch();
 const log = [];
-for (const [q, vp] of [['Sonora', 1440], ['Bend', 1440], ['Groveland, CA', 390], ['Moab, Utah', 390], ['98499', 1440], ['Xyzzyville', 1440]]) {
+const QS = (process.env.QS || 'Sonora|Bend|Groveland, CA|Moab, Utah|98499|Xyzzyville').split('|');
+for (const [q, vp] of QS.map((q, i) => [q, i % 2 ? 390 : 1440])) {
   const p = await b.newPage({ viewport: { width: vp, height: 900 } });
   p.on('pageerror', e => log.push(`${q} pageerror: ${e.message}`));
   p.on('console', m => { if (m.type() === 'error' || m.type() === 'warning') log.push(`${q} console: ${m.text()}`); });
@@ -14,11 +15,11 @@ for (const [q, vp] of [['Sonora', 1440], ['Bend', 1440], ['Groveland, CA', 390],
   await p.waitForTimeout(2000);
   await p.click('#q'); await p.keyboard.type(q, { delay: 60 }); await p.waitForTimeout(2500);
   log.push(`${q} suggestions: ` + JSON.stringify(await p.$$eval('#sugg li', l => l.map(x => x.textContent))) + ' visible=' + await p.isVisible('#sugg'));
-  if (q === 'Sonora') { await p.screenshot({ path: 'tools/shots/search-suggest.png' }); await p.click('#sugg li:nth-child(1)'); }
-  else if (q === 'Bend') { await p.click('.search button'); }
+  if (q === 'Sonora' && !process.env.QS) { await p.screenshot({ path: 'tools/shots/search-suggest.png' }); await p.click('#sugg li:nth-child(1)'); }
+  else if (q === 'Bend' && !process.env.QS) { await p.click('.search button'); }
   else await p.press('#q', 'Enter');
   await p.waitForTimeout(9000);
-  const info = await p.evaluate(() => ({ hash: location.hash, place: document.querySelector('.now .place')?.textContent, say: document.querySelector('#now')?.innerText.slice(0, 300), live: document.getElementById('live')?.textContent, msg: document.getElementById('smsg')?.hidden ? '' : document.getElementById('smsg')?.textContent, tabsScroll: document.getElementById('tabs').scrollLeft }));
+  const info = await p.evaluate(() => ({ hash: location.hash, place: document.querySelector('.now .place')?.textContent, say: document.querySelector('#now')?.innerText.slice(0, 300), live: document.getElementById('live')?.textContent, msg: document.getElementById('smsg')?.hidden ? '' : document.getElementById('smsg')?.textContent, tabsScroll: document.getElementById('tabs').scrollLeft, obs: (typeof S !== 'undefined' && S.custom) ? S.custom.obs.map(id => id + ' ' + JSON.stringify(S.custom.obsInfo[id])) : null }));
   log.push(`${q} result: ${JSON.stringify(info)}`);
   await p.screenshot({ path: `tools/shots/search-${q.replace(/\W+/g, '_')}.png`, fullPage: false });
 }
