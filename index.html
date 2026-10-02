@@ -674,7 +674,7 @@ function renderClimate(st){
       <tr><td>Typical rain on this date</td><td>${cd.normal_pcpn!=null?cd.normal_pcpn.toFixed(2)+'"':'—'}</td></tr></table>
     <div class="note" style="margin-top:8px">${cl.last_date?`Station data through ${new Date(cl.last_date+'T12:00:00Z').toLocaleDateString('en-US',{month:'short',day:'numeric',timeZone:'UTC'})}.`:''}</div>`;
   // month so far
-  const ym=(cl.last_date||'').slice(0,7), mrows=cl.recent.filter(r=>r.date.startsWith(ym));
+  const ym=(cl.last_date||'').slice(0,7), mrows=cl.recent.filter(r=>r.date.startsWith(ym)&&r.date<=cl.last_date);
   const avg=a=>{const v=a.filter(x=>x!=null);return v.length?v.reduce((s,x)=>s+x,0)/v.length:null;};
   if(mrows.length){
     const hi=avg(mrows.map(r=>r.hi)), lo=avg(mrows.map(r=>r.lo)), nhi=avg(mrows.map(r=>cl.days[r.date.slice(5)]?.normal_hi)), nlo=avg(mrows.map(r=>cl.days[r.date.slice(5)]?.normal_lo));
