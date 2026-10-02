@@ -289,10 +289,16 @@ const nws = async path => {
   catch(e){ if(!/^\d{3} /.test(e.message)) S.nwsDownUntil=Date.now()+5*60e3; throw e; }
 };
 const IEM='https://mesonet.agron.iastate.edu';
-async function T(url){ const ctl=new AbortController(), to=setTimeout(()=>ctl.abort(),20000);
-  try{ const r=await fetch(url,{signal:ctl.signal}); if(!r.ok) throw new Error(r.status+' '+url); return await r.text(); } finally{ clearTimeout(to); } }
+// one Iowa Mesonet request at a time (it turns away bursts with a 429), retrying a 429 after a pause
+let iemQ=Promise.resolve();
+function T(url){
+  const run=async()=>{ for(let i=0;;i++){ const ctl=new AbortController(), to=setTimeout(()=>ctl.abort(),20000);
+    try{ const r=await fetch(url,{signal:ctl.signal}); if(r.status===429 && i<3){ await new Promise(res=>setTimeout(res,1500*(i+1))); continue; }
+      if(!r.ok) throw new Error(r.status+' '+url); return await r.text(); } finally{ clearTimeout(to); } } };
+  const p=iemQ.then(run,run); iemQ=p.catch(()=>{}); return p;
+}
 async function iemStations(state){
-  S.iemNet=S.iemNet||{}; if(!S.iemNet[state]) S.iemNet[state]=J(`${IEM}/geojson/network/${state}_ASOS.geojson`,null,2).catch(e=>{ delete S.iemNet[state]; throw e; });
+  S.iemNet=S.iemNet||{}; if(!S.iemNet[state]) S.iemNet[state]=T(`${IEM}/geojson/network/${state}_ASOS.geojson`).then(JSON.parse).catch(e=>{ delete S.iemNet[state]; throw e; });
   return (await S.iemNet[state]).features||[];
 }
 async function iemObs(sid){
