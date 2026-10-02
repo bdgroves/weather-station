@@ -445,7 +445,9 @@ function renderInstruments(st,c){
     `<div class="card"><h3>Humidity</h3><div class="v">${r0(o.rh)}<small>%</small></div><div class="s">dew point <b>${r0(o.dew)}°</b> — ${comfort(o.dew)}${o.temp!=null&&o.dew!=null&&o.temp-o.dew<3?' · fog likely':''}</div></div>`,
     `<div class="card"><h3>Sky${!clouds.length&&!skyText(o)&&fc?' <em>model</em>':''}</h3><div class="v" style="font-size:1.35rem;line-height:1.15">${clouds.length?esc(clouds[0][0].toUpperCase()+clouds[0].slice(1)):esc(skyText(o)||(fc?WMO[fc.current.weather_code]?.[0]:'')||'—')}</div><div class="s">${clouds.slice(1).map(esc).join(' · ')}${o.vis!=null?`${clouds.length>1?'<br>':''}visibility <b>${o.vis>=9.9?'10+':r1(o.vis)}</b> mi`:''}</div></div>`,
     `<div class="card"><h3>Rain</h3><div class="v">${rain24!=null?rain24.toFixed(2):'—'}<small>in</small></div><div class="s">last 24 h (model)${o.p1!=null?` · last hour <b>${(o.p1/25.4).toFixed(2)}</b> in measured`:''}</div></div>`,
-    `<div class="card"><h3>UV · feels like</h3><div class="v">${uv!=null?r1(uv):'—'}<small>UV</small></div><div class="s">${uv!=null?(uv<3?'low':uv<6?'moderate':uv<8?'high':uv<11?'very high':'extreme'):''}${fc?.hourly?` · feels like <b>${r0(fc.hourly.apparent_temperature[fc.hourly.time.indexOf(localStr(Date.now()).slice(0,13)+':00')])}°</b>`:''}</div></div>`,
+    `<div class="card"><h3>UV · feels like</h3><div class="v">${uv!=null?r1(uv):'—'}<small>UV</small></div><div class="s">${uv!=null?(uv<3?'low':uv<6?'moderate':uv<8?'high':uv<11?'very high':'extreme'):''}${(()=>{ const f=o.hi??o.wc??(o.temp!=null?o.temp:null);   // measured heat index or wind chill; otherwise it feels like the temperature
+      if(f!=null) return ` · feels like <b>${r0(f)}°</b>`;
+      return fc?.hourly?` · feels like <b>${r0(fc.hourly.apparent_temperature[fc.hourly.time.indexOf(localStr(Date.now()).slice(0,13)+':00')])}°</b> (model)`:''; })()}</div></div>`,
   ];
   $('inst').innerHTML=cards.join('');
   const ps=ser.filter(o=>o.press!=null);
