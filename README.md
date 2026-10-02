@@ -46,6 +46,8 @@ This isn't your phone's weather app. This is the whole instrument panel — and 
 
 **From the forecaster** — the synopsis from the local NWS office's Area Forecast Discussion: what the atmosphere is doing, in a meteorologist's own words.
 
+**How good is the forecast?** — every day the model's highs and lows 1–7 days ahead are scored against what the station measured (Open-Meteo's archive of its own past forecasts goes back to March 2026), beside two guesses a forecast should beat: the normal for the date, and "same as N days before". The National Weather Service's forecast is saved daily and joins the scoring as it builds up. Each forecast day shows how far off it usually is.
+
 **Against the record books** — the last 30 days of highs and lows against the normal range and the record high and low for every date (with the year), this month vs normal, and rain since October 1 against the water-year normal.
 
 **Air quality, sun and moon** — US AQI and what's driving it, daylight and how fast it's changing, moon phase drawn to scale.
