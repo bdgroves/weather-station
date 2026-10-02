@@ -637,6 +637,11 @@ async function geocode(q){
   if(!name) return [];
   const g=await J(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(name)}&count=20&language=en&countryCode=US`);
   let res=(g.results||[]).filter(r=>r.country_code==='US');
+  if(!/^\d/.test(name)){   // a town name: drop fuzzy matches on other names, and campgrounds/parks when there are towns
+    const n=name.toLowerCase(), named=res.filter(r=>r.name.toLowerCase().startsWith(n)); if(named.length) res=named;
+    const towns=res.filter(r=>/^PPL/.test(r.feature_code||'')); if(towns.length) res=towns;
+  }
+  const seen=new Set(); res=res.filter(r=>{ const k=[r.name,r.admin1,r.admin2].join('|'); if(seen.has(k)) return false; seen.add(k); return true; });
   if(want) res=res.filter(r=>{ const a=(r.admin1||'').toLowerCase(); return a===want || stAbbr(r.admin1).toLowerCase()===want || a.startsWith(want); });
   return res.slice(0,8);
 }
@@ -649,6 +654,8 @@ function showSugg(items){
 }
 function pickPlace(r){
   $('sugg').hidden=true; smsg(''); $('q').value=`${r.name}, ${stAbbr(r.admin1)}`; $('q').blur();
+  const home=STATIONS.find(h=>Math.hypot((h.lon-r.longitude)*Math.cos(h.lat*Math.PI/180),h.lat-r.latitude)*69<5);   // one of the four: use its own tab
+  if(home){ $('q').value=''; return select(home.key); }
   addCustom(r.latitude, r.longitude, r.name, stAbbr(r.admin1), r.elevation!=null?Math.round(r.elevation*3.281):null);
 }
 async function searchPlace(q){
