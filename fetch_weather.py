@@ -35,7 +35,7 @@ OUT = os.path.join(os.path.dirname(__file__), "data")
 STATIONS = [
     {"key": "lakewood_wa", "name": "Lakewood", "state": "WA", "lat": 47.1718, "lon": -122.5185, "elevation_ft": 300,
      "tz": "America/Los_Angeles", "nws": "SEW", "obs": ["KTCM", "KTIW", "KPLU"],
-     "climate": {"sid": "SEAthr 9", "label": "Seattle area (Sea-Tac and earlier city records)"}},
+     "climate": {"sid": "SEAthr 9", "label": "Sea-Tac Airport"}},
     {"key": "groveland_ca", "name": "Groveland", "state": "CA", "lat": 37.8463, "lon": -120.2313, "elevation_ft": 2844,
      "tz": "America/Los_Angeles", "nws": "STO", "obs": ["MOUC1", "GNSC1"],
      "obs_note": "No official station near Groveland. The nearest is the Mount Elizabeth fire-weather station, 15 miles away and 2,100 ft higher.",
@@ -45,7 +45,7 @@ STATIONS = [
      "climate": {"sid": "RNOthr 9", "label": "Reno (airport and earlier city records)"}},
     {"key": "death_valley_ca", "name": "Death Valley", "state": "CA", "lat": 36.4620, "lon": -116.8666, "elevation_ft": -190,
      "tz": "America/Los_Angeles", "nws": "VEF", "obs": ["DEVC1"],
-     "climate": {"sid": "042319 2", "label": "Death Valley (Furnace Creek / Greenland Ranch), since 1911"}},
+     "climate": {"sid": "042319 2", "label": "Death Valley (Furnace Creek / Greenland Ranch)"}},
 ]
 
 WMO = {0: "Clear", 1: "Mainly clear", 2: "Partly cloudy", 3: "Overcast", 45: "Fog", 48: "Rime fog",
@@ -108,7 +108,8 @@ def forecast(st):
            f"&forecast_days=7&past_hours=24")
     d = get(url, accept="application/json")
     d["current"]["weather_text"] = WMO.get(d["current"].get("weather_code"), "")
-    return {"current": d["current"], "hourly": d["hourly"], "daily": d["daily"]}
+    return {"current": d["current"], "hourly": d["hourly"], "daily": d["daily"],
+            "utc_offset_seconds": d.get("utc_offset_seconds")}
 
 
 def alerts(st):
@@ -222,6 +223,12 @@ def main():
         except Exception as e:
             print(f"  forecast failed: {e}")
         rec["observed"] = latest_obs(st)
+        try:
+            rec["air_quality"] = get(f"https://air-quality-api.open-meteo.com/v1/air-quality?latitude={st['lat']}&longitude={st['lon']}"
+                                     f"&current=us_aqi,pm2_5,pm10,ozone,us_aqi_pm2_5,us_aqi_ozone&hourly=us_aqi&timezone=auto&forecast_days=2",
+                                     accept="application/json")
+        except Exception as e:
+            print(f"  air quality failed: {e}")
         rec["alerts"] = alerts(st)
         o = rec["observed"]
         print(f"  observed: {o and o['temp']}°F at {o and o['station']} ({o and o['time']}) · {len(rec['alerts'])} alerts")
