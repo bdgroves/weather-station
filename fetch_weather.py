@@ -241,7 +241,8 @@ def main():
     # climate: once a day (ACIS updates overnight)
     cpath = os.path.join(OUT, "climate.json")
     old = json.load(open(cpath)) if os.path.exists(cpath) else {}
-    if old.get("built") != now.date().isoformat():
+    labels_changed = any(old.get("stations", {}).get(st["key"], {}).get("label") != st["climate"]["label"] for st in STATIONS)
+    if old.get("built") != now.date().isoformat() or labels_changed:
         clim = {"built": now.date().isoformat(), "stations": {}}
         for st in STATIONS:
             try:
