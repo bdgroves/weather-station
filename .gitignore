@@ -1,3 +1,4 @@
 .pixi/
 tools/shots/
 *.log
+__pycache__/

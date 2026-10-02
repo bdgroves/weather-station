@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Weather Station</title>
-<meta name="description" content="A live weather station for Lakewood, Groveland, Reno and Death Valley — real observations from National Weather Service stations, forecasts, the forecaster's own notes, and a century of records for every day of the year.">
+<meta name="description" content="A live weather station for Lakewood, Sonora, Reno and Death Valley — real observations from National Weather Service stations, forecasts, the forecaster's own notes, and a century of records for every day of the year.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
@@ -26,7 +26,8 @@ header.top{position:sticky;top:0;z-index:50;background:rgba(10,14,23,.93);backdr
 .top-in{max-width:1400px;margin:0 auto;padding:10px 24px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
 .brand{display:flex;align-items:center;gap:10px;font:700 1.25rem var(--fd);letter-spacing:.12em}
 .brand .logo{width:30px;height:30px;border-radius:7px;background:var(--amber);color:#111;display:grid;place-items:center;font-size:1rem}
-.tabs{display:flex;gap:4px;flex-wrap:wrap}
+.tabs{display:flex;gap:4px;flex-wrap:wrap;position:relative;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
 .tab{font:500 .95rem var(--fd);letter-spacing:.06em;text-transform:uppercase;padding:7px 12px;border-radius:7px;border:1px solid transparent;background:none;color:var(--t2);cursor:pointer;display:flex;gap:7px;align-items:baseline}
 .tab:hover{background:var(--hover);color:var(--t1)}
 .tab.on{border-color:var(--amber);color:var(--amber);background:var(--amber-dim)}
@@ -35,6 +36,14 @@ header.top{position:sticky;top:0;z-index:50;background:rgba(10,14,23,.93);backdr
 .search{display:flex;gap:6px;align-items:center}
 .search input{background:var(--panel);border:1px solid var(--border);color:var(--t1);border-radius:7px;padding:7px 10px;font:.85rem var(--fb);width:190px}
 .search input:focus{outline:2px solid var(--amber);outline-offset:1px}
+.search{position:relative}
+.search button{background:var(--amber);color:#111;border:0;border-radius:7px;padding:7px 12px;font:600 .8rem var(--fd);letter-spacing:.08em;cursor:pointer}
+.search button:hover{filter:brightness(1.1)}
+.sugg{position:absolute;top:calc(100% + 4px);left:0;right:0;min-width:260px;list-style:none;margin:0;padding:4px;background:var(--panel);border:1px solid var(--border);border-radius:8px;box-shadow:0 10px 30px rgba(0,0,0,.5);z-index:60;max-height:320px;overflow:auto}
+.sugg li{padding:7px 9px;border-radius:5px;cursor:pointer;font:.85rem var(--fb);color:var(--t1)}
+.sugg li small{color:var(--t3);margin-left:6px}
+.sugg li.on,.sugg li:hover{background:rgba(245,166,35,.14)}
+.smsg{position:absolute;top:calc(100% + 4px);left:0;right:0;min-width:220px;padding:7px 10px;background:var(--panel);border:1px solid var(--border);border-radius:8px;font:.8rem var(--fb);color:var(--t2);z-index:60}
 .status{margin-left:auto;font:.68rem var(--fm);color:var(--t3);text-align:right;line-height:1.6}
 .status b{color:var(--green);font-weight:400}
 .status b::before{content:'';display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);margin-right:6px;animation:pulse 2s infinite}
@@ -160,7 +169,12 @@ footer b{color:var(--t2);font-weight:500}
   <div class="top-in">
     <div class="brand"><div class="logo">🌡</div>WEATHER STATION</div>
     <nav class="tabs" id="tabs" aria-label="Stations"></nav>
-    <form class="search" id="search"><input id="q" type="search" placeholder="Any US place…" aria-label="Search a place"></form>
+    <form class="search" id="search" role="search" autocomplete="off">
+      <input id="q" type="search" placeholder="Any US town or ZIP…" aria-label="Search a US place" aria-autocomplete="list" aria-controls="sugg" enterkeyhint="search">
+      <button type="submit" aria-label="Search">Go</button>
+      <ul id="sugg" class="sugg" role="listbox" hidden></ul>
+      <div id="smsg" class="smsg" hidden></div>
+    </form>
     <div class="status"><b id="live">Live</b><br><span id="live-sub"></span></div>
   </div>
 </header>
@@ -223,7 +237,7 @@ footer b{color:var(--t2);font-weight:500}
 
   <footer>
     <div class="fresh" id="fresh"></div>
-    <div><b>Observed</b> conditions come from National Weather Service stations: McChord AFB for Lakewood, Reno–Tahoe airport, the Furnace Creek visitor center in Death Valley, and the Mount Elizabeth fire-weather station for Groveland (there is no official station closer). <b>Forecasts</b>: NWS and Open-Meteo. <b>Records and normals</b>: NOAA's Applied Climate Information System, rebuilt daily. <b>Air quality</b>: Open-Meteo (CAMS). Everything is read live by this page every 5 minutes; a GitHub Action keeps a backup copy.</div>
+    <div><b>Observed</b> conditions come from National Weather Service stations: McChord AFB for Lakewood, Reno–Tahoe airport, the Furnace Creek visitor center in Death Valley, and the Green Spring fire-weather station for Sonora (there is no official station in town). <b>Forecasts</b>: NWS and Open-Meteo. <b>Records and normals</b>: NOAA's Applied Climate Information System, rebuilt daily. <b>Air quality</b>: Open-Meteo (CAMS). Everything is read live by this page every 5 minutes; a GitHub Action keeps a backup copy.</div>
     <div>Code: <a href="https://github.com/bdgroves/weather-station" target="_blank" rel="noopener">github.com/bdgroves/weather-station</a></div>
   </footer>
 </div>
@@ -231,11 +245,13 @@ footer b{color:var(--t2);font-weight:500}
 <script>
 // ═══ stations ══════════════════════════════════════════════════════════════
 const STATIONS = [
-  {key:'lakewood_wa', name:'Lakewood', state:'WA', lat:47.1718, lon:-122.5185, elev:300, office:'SEW', grid:[115,49], obs:['KTCM','KTIW','KPLU'], obsName:'McChord AFB', obsMi:2},
-  {key:'groveland_ca', name:'Groveland', state:'CA', lat:37.8463, lon:-120.2313, elev:2844, office:'STO', grid:[79,27], obs:['MOUC1','GNSC1'], obsName:'Mount Elizabeth RAWS', obsMi:15,
-   note:'No official station near Groveland — the nearest is the Mount Elizabeth fire-weather station, 15 miles off and about 2,100 ft higher, so expect it cooler than town.'},
-  {key:'reno_nv', name:'Reno', state:'NV', lat:39.5296, lon:-119.8138, elev:4505, office:'REV', grid:[45,106], obs:['KRNO'], obsName:'Reno–Tahoe airport', obsMi:3},
-  {key:'death_valley_ca', name:'Death Valley', state:'CA', lat:36.4620, lon:-116.8666, elev:-190, office:'VEF', grid:[63,120], obs:['DEVC1'], obsName:'Furnace Creek visitor center', obsMi:0},
+  {key:'lakewood_wa', name:'Lakewood', state:'WA', lat:47.1718, lon:-122.5185, elev:300, office:'SEW', grid:[115,49], obs:['KTCM','KTIW','KPLU'],
+   obsInfo:{KTCM:['McChord AFB',2], KTIW:['Tacoma Narrows airport',7], KPLU:['Thun Field, Puyallup',12]}},
+  {key:'sonora_ca', name:'Sonora', state:'CA', lat:37.9841, lon:-120.3822, elev:1785, office:'STO', grid:[74,34], obs:['GNSC1','MOUC1'],
+   obsInfo:{GNSC1:['Green Spring RAWS',12], MOUC1:['Mount Elizabeth RAWS',9]},
+   note:'Sonora has no National Weather Service observing station. The readings come from the Green Spring fire-weather station, 12 miles away and about 700 ft lower.'},
+  {key:'reno_nv', name:'Reno', state:'NV', lat:39.5296, lon:-119.8138, elev:4505, office:'REV', grid:[45,106], obs:['KRNO'], obsInfo:{KRNO:['Reno–Tahoe airport',3]}},
+  {key:'death_valley_ca', name:'Death Valley', state:'CA', lat:36.4620, lon:-116.8666, elev:-190, office:'VEF', grid:[63,120], obs:['DEVC1'], obsInfo:{DEVC1:['Furnace Creek visitor center',0]}},
 ];
 const NWS = 'https://api.weather.gov';
 const OM_H = 'temperature_2m,apparent_temperature,precipitation_probability,precipitation,weather_code,wind_speed_10m,wind_direction_10m,wind_gusts_10m,pressure_msl,relative_humidity_2m,uv_index';
@@ -277,6 +293,7 @@ async function getObs(st){
       const start=new Date(Date.now()-30*3600e3).toISOString();
       const [lat, ser] = await Promise.all([nws(`/stations/${id}/observations/latest`), nws(`/stations/${id}/observations?start=${encodeURIComponent(start)}`)]);
       const p=lat.properties; if(p.temperature?.value==null && p.windSpeed?.value==null) continue;
+      if(id!==st.obs[st.obs.length-1] && Date.now()-Date.parse(p.timestamp)>3*3600e3) continue;   // gone quiet: try the next one
       const series=(ser.features||[]).map(f=>obsRow(f.properties)).filter(o=>o.t).sort((a,b)=>a.t-b.t);
       return {id, latest:obsRow(p), series, live:true};
     }catch(e){ console.warn('obs',id,e.message); }
@@ -336,6 +353,8 @@ function renderTabs(){
   $('tabs').innerHTML=STATIONS.concat(S.custom?[S.custom]:[]).map(st=>{ const c=S.cache[st.key]; const t=c?.obs?.latest?.temp;
     return `<button class="tab${S.cur===st?' on':''}" data-k="${st.key}">${esc(st.name)}${t!=null?`<span class="tt">${r0(t)}°</span>`:''}${c?.alerts?.length?'<span class="dot" title="active alert"></span>':''}</button>`; }).join('');
   $('tabs').querySelectorAll('.tab').forEach(b=>b.onclick=()=>select(b.dataset.k));
+  const t=$('tabs'), on=t.querySelector('.on');
+  if(on && t.scrollWidth>t.clientWidth) t.scrollLeft=Math.max(0,on.offsetLeft-(t.clientWidth-on.offsetWidth)/2);
 }
 function renderAlerts(al){
   $('alerts').innerHTML=(al||[]).map(a=>`<details class="alert a-${esc(a.severity||'Unknown')}"><summary><span>⚠</span><div><div class="ev">${esc(a.event)}</div><div class="hd">${esc(a.headline||'')}</div></div></summary><pre>${esc(a.description||'')}${a.instruction?'\n\n'+esc(a.instruction):''}</pre></details>`).join('');
@@ -358,7 +377,7 @@ function todaySoFar(series){
 }
 function renderNow(st,c){
   const o=c.obs?.latest, fc=c.fc;
-  if(!o){ $('now').innerHTML=`<div class="place">${esc(st.name)}, ${esc(st.state)}</div><div class="say">No live observation available right now${fc?'; showing the model only.':'.'}</div>`; return; }
+  if(!o){ $('now').innerHTML=`<div class="place">${esc(st.name)}${st.state?', '+esc(st.state):''}</div><div class="say">No live observation available right now${fc?'; showing the model only.':'.'}</div>`; return; }
   const isDay = fc?.current?.is_day ?? 1;
   const modelSky = !skyText(o);
   const text = skyText(o) || (fc?WMO[fc.current.weather_code]?.[0]:'') || '';
@@ -378,12 +397,12 @@ function renderNow(st,c){
     if(tsf.lo<=cd.record_lo) say+=` <b style="color:var(--blue)">The low ties or beats the record of ${r0(cd.record_lo)}° from ${cd.record_lo_year}.</b>`;
   }
   if(cl) say+=` <span class="muted">Records: ${esc(cl.label)}${/since/.test(cl.label)?'':`, since ${cl.first_year}`}.</span>`;
-  if(st.note) say+=`<br><span class="muted">${esc(st.note)}</span>`;
+  if(st.note && c.obs.id===st.obs[0]) say+=`<br><span class="muted">${esc(st.note)}</span>`;
   $('now').innerHTML=`
-    <div class="place">${esc(st.name)}, ${esc(st.state)}<small>${st.elev!=null?st.elev.toLocaleString()+' ft':''}</small></div>
+    <div class="place">${esc(st.name)}${st.state?', '+esc(st.state):''}<small>${st.elev!=null?st.elev.toLocaleString()+' ft':''}</small></div>
     <div class="big"><div class="temp">${r0(o.temp)}<sup>°F</sup></div><div><div class="icon">${icon(text,isDay)}</div></div></div>
     <div class="cond">${esc(text||'—')}${modelSky&&text?' <span style="font-size:.75rem;color:var(--t3)">sky from the model</span>':''}${feels?` <span style="font-size:.9rem;color:var(--t2)">· ${feels[0]} ${r0(feels[1])}°</span>`:''}</div>
-    <div class="src">${c.obs.live?'Measured':'Last backup copy'} <b>${ago(o.t)}</b> at <b>${esc(c.obs.id)}</b>${st.obsName&&c.obs.id===st.obs[0]?` · ${esc(st.obsName)}${st.obsMi?`, ${st.obsMi} mi away`:''}`:''}</div>
+    <div class="src">${c.obs.live?'Measured':'Last backup copy'} <b>${ago(o.t)}</b> at <b>${esc(c.obs.id)}</b>${(()=>{ const i=st.obsInfo?.[c.obs.id]; return i?` · ${esc(i[0])}${i[1]?`, ${i[1]} mi away`:''}`:''; })()}</div>
     <div class="chips">${chips.join('')}</div>
     ${say?`<div class="say">${say}</div>`:''}`;
 }
@@ -502,7 +521,7 @@ function renderAFD(st,afd){
 function renderClimate(st){
   const cl=climFor(st);
   if(!cl){ $('clim-intro').textContent='Records and normals are kept for the four home stations.'; ['otd','month','wy'].forEach(id=>$(id).innerHTML='<div class="note">—</div>'); mk('climChart',{type:'line',data:{datasets:[]}}); $('c-sub').textContent=''; return; }
-  $('clim-intro').innerHTML=`Daily records from <b>${esc(cl.label)}</b>, ${esc(cl.name||'')} — kept since ${cl.first_year}. Normals are the 1991–2020 average, smoothed over two weeks.`;
+  $('clim-intro').innerHTML=`Daily records from <b>${esc(cl.label)}</b>${cl.name&&!cl.label.toLowerCase().startsWith(cl.name.toLowerCase())?', '+esc(cl.name):''} — kept since ${cl.first_year}. Normals are the 1991–2020 average, smoothed over two weeks.`;
   const rec=cl.recent.slice(-31);
   const labels=rec.map(r=>r.date.slice(5)); const lbl=rec.map(r=>new Date(r.date+'T12:00:00Z').toLocaleDateString('en-US',{month:'short',day:'numeric',timeZone:'UTC'}));
   const days=labels.map(md=>cl.days[md]||{});
@@ -602,32 +621,69 @@ function renderFresh(st,c){
 // ═══ selection, search, refresh ════════════════════════════════════════════
 async function select(key, quick){
   const st=STATIONS.find(s=>s.key===key)||(S.custom?.key===key?S.custom:null)||STATIONS[0];
-  S.cur=st; if(!st.custom) history.replaceState(null,'','#'+st.key.split('_').slice(0,-1).join('-')); else history.replaceState(null,'',`#@${st.lat.toFixed(3)},${st.lon.toFixed(3)},${encodeURIComponent(st.name)}`);
+  S.cur=st; if(!st.custom) history.replaceState(null,'','#'+st.key.split('_').slice(0,-1).join('-')); else history.replaceState(null,'',`#@${st.lat.toFixed(3)},${st.lon.toFixed(3)},${encodeURIComponent(st.name)},${encodeURIComponent(st.state||'')}`);
   renderTabs();
   if(S.cache[st.key]?.at) render(st);
   await loadStation(st, quick);
   if(S.cur===st) render(st);
   renderGlance();
 }
-async function searchPlace(q){
-  try{
-    const g=await J(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(q)}&count=5&countryCode=US`);
-    const r=g.results?.[0]; if(!r){ alert('No US place found for "'+q+'"'); return; }
-    await addCustom(r.latitude, r.longitude, r.name, r.admin1_code||r.admin1||'', r.elevation!=null?Math.round(r.elevation*3.281):null);
-  }catch(e){ alert('Search failed: '+e.message); }
+// ── place search: Open-Meteo geocoding, US only; "Town", "Town, ST", "Town, State" or a ZIP
+const USST={AL:'Alabama',AK:'Alaska',AZ:'Arizona',AR:'Arkansas',CA:'California',CO:'Colorado',CT:'Connecticut',DE:'Delaware',DC:'District of Columbia',FL:'Florida',GA:'Georgia',HI:'Hawaii',ID:'Idaho',IL:'Illinois',IN:'Indiana',IA:'Iowa',KS:'Kansas',KY:'Kentucky',LA:'Louisiana',ME:'Maine',MD:'Maryland',MA:'Massachusetts',MI:'Michigan',MN:'Minnesota',MS:'Mississippi',MO:'Missouri',MT:'Montana',NE:'Nebraska',NV:'Nevada',NH:'New Hampshire',NJ:'New Jersey',NM:'New Mexico',NY:'New York',NC:'North Carolina',ND:'North Dakota',OH:'Ohio',OK:'Oklahoma',OR:'Oregon',PA:'Pennsylvania',RI:'Rhode Island',SC:'South Carolina',SD:'South Dakota',TN:'Tennessee',TX:'Texas',UT:'Utah',VT:'Vermont',VA:'Virginia',WA:'Washington',WV:'West Virginia',WI:'Wisconsin',WY:'Wyoming',PR:'Puerto Rico',GU:'Guam',VI:'U.S. Virgin Islands',AS:'American Samoa',MP:'Northern Mariana Islands'};
+const stAbbr = full => Object.keys(USST).find(k=>USST[k]===full) || full || '';
+const SR={items:[], idx:-1, seq:0, timer:null};
+async function geocode(q){
+  const [name, ...rest]=q.split(',').map(x=>x.trim()); const want=rest.join(' ').trim().toLowerCase();
+  if(!name) return [];
+  const g=await J(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(name)}&count=20&language=en&countryCode=US`);
+  let res=(g.results||[]).filter(r=>r.country_code==='US');
+  if(want) res=res.filter(r=>{ const a=(r.admin1||'').toLowerCase(); return a===want || stAbbr(r.admin1).toLowerCase()===want || a.startsWith(want); });
+  return res.slice(0,8);
 }
+function smsg(t){ const m=$('smsg'); m.hidden=!t; m.textContent=t||''; if(t) $('sugg').hidden=true; }
+function showSugg(items){
+  SR.items=items; SR.idx=items.length?0:-1; const u=$('sugg');
+  u.innerHTML=items.map((r,i)=>`<li role="option" data-i="${i}"${i===0?' class="on"':''}>${esc(r.name)}, ${esc(stAbbr(r.admin1))}<small>${esc([r.admin2,r.postcodes?.[0]].filter(Boolean).join(' · '))}</small></li>`).join('');
+  u.hidden=!items.length; if(items.length) smsg('');
+  u.querySelectorAll('li').forEach(li=>li.onmousedown=e=>{ e.preventDefault(); pickPlace(SR.items[+li.dataset.i]); });
+}
+function pickPlace(r){
+  $('sugg').hidden=true; smsg(''); $('q').value=`${r.name}, ${stAbbr(r.admin1)}`; $('q').blur();
+  addCustom(r.latitude, r.longitude, r.name, stAbbr(r.admin1), r.elevation!=null?Math.round(r.elevation*3.281):null);
+}
+async function searchPlace(q){
+  if(SR.items.length && SR.idx>=0 && $('q').value.trim()===q && !$('sugg').hidden) return pickPlace(SR.items[SR.idx]);
+  smsg('Searching…');
+  try{ const res=await geocode(q); if(!res.length) return smsg(`No US place found for “${q}”. Try a town name or a ZIP code.`); pickPlace(res[0]); }
+  catch(e){ smsg('Place search is unavailable right now.'); }
+}
+$('q').addEventListener('input',()=>{
+  clearTimeout(SR.timer); const q=$('q').value.trim(); smsg('');
+  if(q.length<2){ $('sugg').hidden=true; SR.items=[]; return; }
+  SR.timer=setTimeout(async()=>{ const n=++SR.seq; try{ const res=await geocode(q); if(n===SR.seq && $('q').value.trim()===q) showSugg(res); }catch(e){} },250);
+});
+$('q').addEventListener('keydown',e=>{
+  const u=$('sugg'); if(u.hidden||!SR.items.length) { if(e.key==='Escape') smsg(''); return; }
+  if(e.key==='ArrowDown'||e.key==='ArrowUp'){ e.preventDefault(); SR.idx=(SR.idx+(e.key==='ArrowDown'?1:-1)+SR.items.length)%SR.items.length; u.querySelectorAll('li').forEach((li,i)=>li.classList.toggle('on',i===SR.idx)); }
+  else if(e.key==='Escape'){ u.hidden=true; }
+});
+$('q').addEventListener('blur',()=>setTimeout(()=>{ $('sugg').hidden=true; },150));
 async function addCustom(lat, lon, name, state, elev){
-  const st={key:'custom', custom:true, name, state, lat, lon, elev, obs:[], office:null, grid:null};
+  const st={key:'custom', custom:true, name, state, lat, lon, elev, obs:[], obsInfo:{}, office:null, grid:null};
   try{ const p=(await nws(`/points/${lat.toFixed(4)},${lon.toFixed(4)}`)).properties; st.office=p.gridId; st.grid=[p.gridX,p.gridY];
-       const sts=(await nws(`/points/${lat.toFixed(4)},${lon.toFixed(4)}/stations`)).features.slice(0,3);
-       st.obs=sts.map(f=>f.properties.stationIdentifier); const f0=sts[0]; if(f0){ st.obsName=f0.properties.name; const [x,y]=f0.geometry.coordinates; st.obsMi=Math.round(Math.hypot((x-lon)*Math.cos(lat*Math.PI/180),(y-lat))*69); } }catch(e){}
+       // nearest observing stations by actual distance (the API's own order isn't always nearest-first)
+       const title=s=>/[a-z]/.test(s)?s:s.toLowerCase().replace(/\b\w/g,c=>c.toUpperCase());
+       const sts=(await nws(`/points/${lat.toFixed(4)},${lon.toFixed(4)}/stations`)).features.map(f=>{ const [x,y]=f.geometry.coordinates;
+         return {id:f.properties.stationIdentifier, name:title(f.properties.name||''), mi:Math.round(Math.hypot((x-lon)*Math.cos(lat*Math.PI/180),(y-lat))*69)}; })
+         .sort((a,b)=>a.mi-b.mi).slice(0,4);
+       st.obs=sts.map(s=>s.id); sts.forEach(s=>st.obsInfo[s.id]=[s.name,s.mi]); }catch(e){}
   S.custom=st; delete S.cache.custom; select('custom');
 }
 
 async function boot(){
   await loadStatic(); renderMoon();
-  const h=location.hash.slice(1);
-  if(h.startsWith('@')){ const [la,lo,...nm]=h.slice(1).split(','); await addCustom(+la,+lo,decodeURIComponent(nm.join(','))||'Custom',''); }
+  let h=location.hash.slice(1); if(h==='groveland') h='sonora';   // old links
+  if(h.startsWith('@')){ const [la,lo,...nm]=h.slice(1).split(','); await addCustom(+la,+lo,decodeURIComponent(nm[0]||'')||'Custom',decodeURIComponent(nm[1]||'')); }
   else { const st=STATIONS.find(s=>s.key.startsWith(h.replace(/-/g,'_')+'_')) || STATIONS[0]; await select(st.key); }
   // fill in the other stations' current conditions in the background
   for(const st of STATIONS){ if(!S.cache[st.key]?.at){ loadStation(st,true).then(()=>{ renderGlance(); renderTabs(); }); } }

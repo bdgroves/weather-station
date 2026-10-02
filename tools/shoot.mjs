@@ -3,7 +3,7 @@ import { chromium } from 'playwright';
 import fs from 'fs';
 const b = await chromium.launch();
 const errs = [];
-for (const [name, vp, hash] of [['desk', { width: 1440, height: 900 }, ''], ['phone', { width: 390, height: 844 }, ''], ['groveland', { width: 1440, height: 900 }, 'groveland'], ['dv-phone', { width: 390, height: 844 }, 'death-valley']]) {
+for (const [name, vp, hash] of [['desk', { width: 1440, height: 900 }, ''], ['phone', { width: 390, height: 844 }, ''], ['sonora', { width: 1440, height: 900 }, 'sonora'], ['dv-phone', { width: 390, height: 844 }, 'death-valley']]) {
   const p = await b.newPage({ viewport: vp });
   p.on('pageerror', e => errs.push(`${name}: ${e.message}`));
   p.on('console', m => { if (m.type() === 'error') errs.push(`${name} console: ${m.text()}`); });
