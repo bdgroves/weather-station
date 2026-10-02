@@ -12,8 +12,13 @@ for (const [name, vp, hash] of [['desk', { width: 1440, height: 900 }, ''], ['ph
   await p.waitForTimeout(3000);
   errs.push(`${name} status: ` + await p.evaluate(() => (document.getElementById('live')?.textContent || '?') + ' | ' + (document.getElementById('live-sub')?.textContent || '')));
   await p.screenshot({ path: `tools/shots/${name}.png`, fullPage: true });
-  const rd = await p.$('#radar-sec'); if (rd) { await rd.scrollIntoViewIfNeeded(); await p.waitForTimeout(4000); await p.click('#r-play'); await p.$eval('#r-slide', e => { e.value = 11; e.dispatchEvent(new Event('input')); }); await p.waitForTimeout(2500); await rd.screenshot({ path: `tools/shots/${name}-radar.png` }); }
-  const fz = await p.$('#freeze'); if (fz) { const g = await fz.evaluateHandle(e => e.closest('.g3')); await g.asElement().screenshot({ path: `tools/shots/${name}-freeze.png` }); errs.push(`${name} freeze: ` + (await fz.innerText()).replace(/\s+/g, ' ')); }
+  try {
+    const rd = await p.$('#radar-sec');
+    if (rd) { await rd.scrollIntoViewIfNeeded(); await p.waitForTimeout(5000);
+      await p.$eval('#r-slide', e => { e.value = 11; e.dispatchEvent(new Event('input')); });   // pauses on the latest frame
+      await p.waitForTimeout(2500); await rd.screenshot({ path: `tools/shots/${name}-radar.png` }); }
+  } catch (e) { errs.push(`${name} radar shot failed: ${e.message.split('\n')[0]}`); }
+  try { const fz = await p.$('#freeze'); if (fz) { const g = await fz.evaluateHandle(e => e.closest('.g3')); await g.asElement().screenshot({ path: `tools/shots/${name}-freeze.png` }); errs.push(`${name} freeze: ` + (await fz.innerText()).replace(/\s+/g, ' ')); } } catch (e) { errs.push(`${name} freeze shot failed: ${e.message.split('\n')[0]}`); }
   errs.push(`${name} radar: ` + await p.evaluate(() => document.getElementById('r-time')?.textContent + ' tiles loaded: ' + [...document.querySelectorAll('#radar img.leaflet-tile-loaded')].length));
   const v = await p.$('#v-sec'); if (v) await v.screenshot({ path: `tools/shots/${name}-verify.png` });
   errs.push(`${name} verify: ` + await p.evaluate(() => document.getElementById('v-say')?.innerText || ''));
